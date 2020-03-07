@@ -1,0 +1,48 @@
+#welcome-text{
+  font-family: 'Montserrat', sans-serif;
+  font-size: 3rem;
+}
+
+#description-text{
+  font-family: 'Nunito', sans-serif;
+  color: rgb(200,200,200);
+}
+
+#uses-heading{
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 2rem;
+}
+
+#uses-list{
+  font-family: 'Raleway', sans-serif;
+  font-size: 1rem;
+}
+
+#badge-heading{
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 2rem;
+}
+
+@media screen and (min-width:768px){
+
+  #welcome-text{
+    line-height: 1.5;
+    word-spacing: .5rem;
+    font-size: 4rem;
+  }
+  #description-text{
+    font-size: 1.5rem;
+  }
+  #uses-heading{
+    font-size: 3rem;
+    word-spacing: .5rem;
+  }
+  #uses-list{
+    font-size: 2rem;
+  }
+  #badge-heading{
+    font-size: 2.5rem;
+    word-spacing: .5rem;
+  }
+
+}
