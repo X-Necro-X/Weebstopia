@@ -46,3 +46,6 @@ body {
     margin-bottom: -1px;
     border-radius: 0;
 }
+.invalid{
+  border:1px solid red;
+}
