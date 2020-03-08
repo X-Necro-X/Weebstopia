@@ -35,11 +35,9 @@ app.get("/loginP",(req,res)=>{
     res.sendFile(__dirname+"/signin.html");
 });
 
-app.get('/', checklogin,(req, res) => {
+app.get('/', (req, res) => {
     res.render('index');
 });
-
-
 
 app.get('/log',(req,res)=>{
     res.render('logout');
@@ -47,7 +45,6 @@ app.get('/log',(req,res)=>{
 const loginUsers=new mongoose.Schema({
     email:String,
     password:String,
-    fullName:String
 });
 const users=mongoose.model("user",loginUsers);
 app.post('/login',(req,res)=>{
