@@ -3,12 +3,12 @@ const ejs = require("ejs");
 
 const app = express();
 app.set('view engine', 'ejs');
-app.use(express.static(__dirname+'/public/index'));
+app.use(express.static('public/index'));
 
 app.get('/', (req, res) => {
     res.render('index');
 });
 
-app.listen(4000, () => {
+app.listen(3000, () => {
     console.log("Server started!");
 });
