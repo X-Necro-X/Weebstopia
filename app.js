@@ -31,6 +31,10 @@ app.post("/loginP",(req,res)=>{
     res.sendFile(__dirname+"/signin.html");
 });
 
+app.get("/loginP",(req,res)=>{
+    res.sendFile(__dirname+"/signin.html");
+});
+
 app.get('/', (req, res) => {
     res.render('index');
 });
