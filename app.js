@@ -56,10 +56,15 @@ app.post('/login',(req,res)=>{
             console.log(user);
             if(user&&user.email===e&&user.password===p){
                 req.session.userId=user.id;
-                return res.redirect('/log');
+                res.send({"successfull":true});
             }
             else{
-                return res.redirect('/loginP');
+                var k=0,j=0;
+                if((user.email!==e))
+                k=1;
+                if((user.password!==p))
+                j=1;
+                res.send({"email":k,"password":j,"successfull":false});
             }
         });
     }
