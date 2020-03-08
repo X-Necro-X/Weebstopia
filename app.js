@@ -2,16 +2,15 @@ const express = require('express');
 const ejs = require("ejs");
 const session=require('express-session')
 const bodyParser=require('body-parser');
+const mongoose=require("mongoose");
 
 const app = express();
+mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Users",{useNewUrlParser:true,useUnifiedTopology: true});
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
 
 app.use(bodyParser.urlencoded({extended:true}));
 
-const users=[
-    {id:1,email:'a@gmail.com',password:"test"}
-];
 
 app.use(session({
     saveUninitialized:false,
@@ -24,6 +23,7 @@ app.use(session({
         secure: true
     }
 }));
+
 
 /*------------------Login---------------------*/
 
@@ -38,21 +38,26 @@ app.get('/', (req, res) => {
 app.get('/log',(req,res)=>{
     res.render('logout');
 })
-
-
+const loginUsers=new mongoose.Schema({
+    email:String,
+    password:String,
+});
+const users=mongoose.model("user",loginUsers);
 app.post('/login',(req,res)=>{
     const e=req.body.email;
     const p=req.body.pname;
     console.log(req.body,e,p);
     if(e&&p){
-        const user=users.find(user=>user.email===e && user.password===p);
-        if(user){
-            req.session.userId=user.id;
-            return res.redirect('/log');
-        }
-        else{
-            return res.redirect('/loginP');
-        }
+        users.findOne({email:e},function(err,user){
+            console.log(user);
+            if(user&&user.email===e&&user.password===p){
+                req.session.userId=user.id;
+                return res.redirect('/log');
+            }
+            else{
+                return res.redirect('/loginP');
+            }
+        });
     }
 });
 
