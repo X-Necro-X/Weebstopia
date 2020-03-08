@@ -7,6 +7,7 @@ app.use(express.static(__dirname+'/public/index'));
 
 app.get('/', (req, res) => {
     res.render('index');
+    // hi
 });
 
 app.listen(4000, () => {
