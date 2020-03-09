@@ -10,6 +10,7 @@ mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Use
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+app.use(session({secret: "Shh, its a secret!"}));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
 
@@ -70,6 +71,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/log', (req, res) => {
+    console.log("gLog reqest", req.session);
+    if(!req.session.uid)
+        return res.redirect("/loginP")
     res.render('logout');
 });
 app.post('/login', (req, res) => {
@@ -88,9 +92,13 @@ app.post('/login', (req, res) => {
                 res.send({"email":-1,"successfull": false});
             }
             else if (user.email === e && user.password === hvalue) {
+
+                req.session.uid = user.id;
+                console.log("setting cookie", req.session, user);
                 res.send({
                     "successfull": true
                 });
+                
             } else {
                 if ((user.email !== e))
                     k = 1;
@@ -107,6 +115,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post("/logOut", (req, res) => {
+    req.session.destroy();
     res.redirect("/");
 });
 
