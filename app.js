@@ -10,7 +10,11 @@ mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Use
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-app.use(session({secret: "Shh, its a secret!"}));
+app.use(session({
+    secret: "Shh, its a secret!",
+    resave: true,
+    saveUninitialized: true
+}));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
 app.use(express.static('public/upload'));
@@ -28,25 +32,22 @@ const loginUsers = new mongoose.Schema({
 const users = mongoose.model("user", loginUsers);
 
 
-
-function saveUser(data,res) {
+function saveUser(data, res) {
     users.findOne({
         email: data.email
-    },function(err,user){
-        if(!user)
-        {
+    }, function (err, user) {
+        if (!user) {
             const newUser = new users({
                 fullName: data.fullName,
                 email: data.email,
                 password: crypto.createHash('sha256').update(data.password).digest('hex').toString()
             });
             newUser.save();
-        }
-        else{
+        } else {
             return res.redirect("/sign-up");
         }
     });
-    
+
 }
 
 /*--------------search user-------------------*/
@@ -82,7 +83,7 @@ app.post('/sign-up', (req, res) => {
 });
 
 app.post('/save-user', (req, res) => {
-    saveUser(req.body,res);
+    saveUser(req.body, res);
     res.redirect("/loginP");
 });
 
@@ -106,7 +107,7 @@ app.get('/', (req, res) => {
 
 app.get('/log', (req, res) => {
     console.log("gLog reqest", req.session);
-    if(!req.session.uid)
+    if (!req.session.uid)
         return res.redirect("/loginP")
     res.render('logout');
 });
@@ -120,19 +121,21 @@ app.post('/login', (req, res) => {
             email: e
         }, function (err, user) {
             var k = 0,
-            j = 0;
+                j = 0;
             console.log(user);
-            if(!user){
-                res.send({"email":-1,"successfull": false});
-            }
-            else if (user.email === e && user.password === hvalue) {
+            if (!user) {
+                res.send({
+                    "email": -1,
+                    "successfull": false
+                });
+            } else if (user.email === e && user.password === hvalue) {
 
                 req.session.uid = user.id;
                 console.log("setting cookie", req.session, user);
                 res.send({
                     "successfull": true
                 });
-                
+
             } else {
                 if ((user.email !== e))
                     k = 1;
@@ -159,9 +162,11 @@ app.get("/:customListName",function(req,res){
         if(!err){
             if(!results){
                 res.redirect("/");
-            }
-            else{
-                res.render("profile",{name: results.name,image:results.image});
+            } else {
+                res.render("profile", {
+                    name: results.name,
+                    image: results.image
+                });
             }
         }
     });
