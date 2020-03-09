@@ -15,9 +15,16 @@
 
 <body>
     <div class="jumbotron">
-        <center><img src="thief-2.jpeg" alt="" height=200><br><br>
+        <center><img src="<%= id %>.jpg" alt="" height=200><br><br>
         Name:Vaibhav SHukla
         </center>
+        <form action='/upload' method='post' encType="multipart/form-data">
+            <input type="file" name="sampleFile" />
+            <input type='submit' value='Upload!' />
+        </form>
+
+
+
     </div>
 
     <!-- Optional JavaScript -->
