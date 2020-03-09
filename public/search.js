@@ -65,7 +65,7 @@ $(document).ready(function () {
       $("#display-container").addClass("row");
       data.results.forEach(function (item) {
         content += object.hd + object.hi + item.image_url + object.ti + object.ht + item.title + object.tt + object.hb + item.mal_id + object.tb + object.td;
-      });
+      });      
       $("#loader").hide(250);
       $("#next-button").show(0);
       $("#previous-button").show(0);
