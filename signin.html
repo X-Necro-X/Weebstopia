@@ -57,6 +57,8 @@
           if(data.successfull) {
             return window.location = "/log";
           }
+          if((data.email==-1))
+          document.getElementById("email").style.border="2px solid red";
           if(data.email==1)
           document.getElementById("email").style.border="2px solid red";
           if(data.password==1)

@@ -17,21 +17,45 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+const loginUsers = new mongoose.Schema({
+    email: String,
+    password: String,
+    fullName:String
+});
+const users = mongoose.model("user", loginUsers);
 
-app.use(session({
-    saveUninitialized: false,
-    secret: "domain",
-    name: 'login',
-    resave: false,
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 2,
-        sameSite: true,
-        secure: true
-    }
-}));
 
+function saveUser(data,res) {
+    users.findOne({
+        email: data.email
+    },function(err,user){
+        if(!user)
+        {
+            const newUser = new users({
+                fullName: data.fullName,
+                email: data.email,
+                password: crypto.createHash('sha256').update(data.password).digest('hex').toString()
+            });
+            newUser.save();
+        }
+        else{
+            return res.redirect("/sign-up");
+        }
+    });
+    
+}
+
+app.post('/sign-up', (req, res) => {
+    res.render('sign-up');
+});
+
+app.post('/save-user', (req, res) => {
+    saveUser(req.body,res);
+    res.redirect("/loginP");
+});
 
 /*------------------Login---------------------*/
+
 
 app.post("/loginP", (req, res) => {
     res.sendFile(__dirname + "/signin.html");
@@ -47,12 +71,7 @@ app.get('/', (req, res) => {
 
 app.get('/log', (req, res) => {
     res.render('logout');
-})
-const loginUsers = new mongoose.Schema({
-    email: String,
-    password: String,
 });
-const users = mongoose.model("user", loginUsers);
 app.post('/login', (req, res) => {
     const e = req.body.email;
     const p = req.body.pname;
@@ -62,15 +81,17 @@ app.post('/login', (req, res) => {
         users.findOne({
             email: e
         }, function (err, user) {
+            var k = 0,
+            j = 0;
             console.log(user);
-            if (user && user.email === e && user.password === hvalue) {
-                req.session.userId = user.id;
+            if(!user){
+                res.send({"email":-1,"successfull": false});
+            }
+            else if (user.email === e && user.password === hvalue) {
                 res.send({
                     "successfull": true
                 });
             } else {
-                var k = 0,
-                    j = 0;
                 if ((user.email !== e))
                     k = 1;
                 if ((user.password !== p))
@@ -86,14 +107,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post("/logOut", (req, res) => {
-    req.session.destroy(function (err) {
-        if (err) {
-            console.log(err);
-        } else {
-            res.clearCookie("login");
-        }
-        return res.redirect("/");
-    })
+    res.redirect("/");
 });
 
 app.listen(3000, () => {
