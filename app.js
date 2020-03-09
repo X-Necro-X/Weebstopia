@@ -25,6 +25,13 @@ const loginUsers = new mongoose.Schema({
 });
 const users = mongoose.model("user", loginUsers);
 
+const profileUsers = new mongoose.Schema({
+    email: String,
+    password: String,
+    fullName:String
+});
+const userPro = mongoose.model("userProfiles", profileUsers);
+
 
 function saveUser(data,res) {
     users.findOne({
@@ -67,7 +74,11 @@ app.get("/loginP", (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.render('index');
+    /*if(req.session.uid)
+    res.render('logout');
+    else
+    res.render('index');*/
+    res.render('profile');
 });
 
 app.get('/log', (req, res) => {
@@ -117,6 +128,21 @@ app.post('/login', (req, res) => {
 app.post("/logOut", (req, res) => {
     req.session.destroy();
     res.redirect("/");
+});
+
+/*---------------user search----------------------*/
+app.get("/:customListName",function(req,res){
+    userPro.findOne({email:req.params.customListName},function(err,results){
+        if(!err){
+            if(!results){
+                res.redirect("/");
+            }
+            else{
+                res.render("profile",{name: results.name,image:results.image});
+            }
+        }
+    });
+    console.log(req.params.customListName);
 });
 
 app.listen(3000, () => {
