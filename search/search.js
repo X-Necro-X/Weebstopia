@@ -8,12 +8,14 @@ $(document).ready(function () {
   var pg;
   var userSearch;
   const object = {
-    hd: "<div class='col-3'>",
+    hd: "<div class='list-group col-2'>",
     td: "</div>",
     hi: "<img src='",
     ti: "' />",
     ht: "<p>",
-    tt: "</p>"
+    tt: "</p>",
+    hb: "<button class='add' id='",
+    tb: "'>Add</button>"
   };
 
   $("#search-button").click(search);
@@ -62,7 +64,7 @@ $(document).ready(function () {
       $("#display-container").html("");
       $("#display-container").addClass("row");
       data.results.forEach(function (item) {
-        content += object.hd + object.hi + item.image_url + object.ti + object.ht + item.title + object.tt + object.td;
+        content += object.hd + object.hi + item.image_url + object.ti + object.ht + item.title + object.tt + object.hb + item.mal_id + object.tb + object.td;
       });
       $("#loader").hide(250);
       $("#next-button").show(0);
