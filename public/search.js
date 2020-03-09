@@ -14,8 +14,8 @@ $(document).ready(function () {
     ti: "' />",
     ht: "<p>",
     tt: "</p>",
-    hb: "<button class='add' id='",
-    tb: "'>Add</button>"
+    hb: "<button onclick='add(",
+    tb: ")'>Add</button>"
   };
 
   $("#search-button").click(search);
@@ -96,6 +96,10 @@ $(document).ready(function () {
         $("#next-button").prop("disabled", false);
       });
 
+  }
+
+  function add(id){
+    $.post('/add/' + id);
   }
 
 });
