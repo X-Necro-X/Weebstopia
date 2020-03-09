@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8">
+  <title>Search Anime</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+  </script>
+
+  <style>
+    #search-box:focus {
+      outline-color: #000000;
+    }
+
+    #search-button:focus {
+      outline-color: #343a40;
+    }
+
+    #default-search {
+      min-height: 75vh;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container-fluid p-5 bg-dark input-group">
+    <input type="text" id="search-box" placeholder="Search..."
+      class="border border-dark rounded-left border-0 bg-secondary pl-2" autofocus>
+    <button class="border border-dark rounded-right border-0 bg-secondary" id="search-button"><img src="search.png"
+        alt="Search" height="35" width="35" /></button>
+  </div>
+
+  <div class="d-flex justify-content-around">
+    <button type="button" class="btn btn-secondary" id="previous-button">Previous</button>
+    <button type="button" class="btn btn-secondary" id="next-button">Next</button>
+  </div>
+
+  <div class="d-flex justify-content-center pt-5">
+    <img id="loader" src="loader.gif" alt="Loading..." />
+  </div>
+
+  <div id="display-container" class="container-fluid">
+    <div id="default-search" class="d-flex align-items-center justify-content-center">
+      <p class="h6 text-muted">Your search will appear here...</p>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+  </script>
+  <script src="search.js"></script>
+
+</body>
+
+</html>
