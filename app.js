@@ -70,9 +70,26 @@ app.post('/searchuser',(req,res)=>{
 app.post('/showprofile',(req,res)=>{
     console.log(req.body);
     users.findOne({_id: req.body["hello"]},function(err,user){
+        res.redirect("/"+user.fullName)
         console.log(user);
-        res.render('profile',{profname:user.fullName,profimage:user.image})
 });
+});
+
+/*---------------user search----------------------*/
+app.get("/:customListName",function(req,res){
+    users.findOne({fullName:req.params.customListName},function(err,results){
+        if(!err){
+            if(!results){
+                res.redirect("/");
+            } else {
+                res.render("profile", {
+                    name: results.fullName,
+                    image: results.image
+                });
+            }
+        }
+    });
+    console.log(req.params.customListName);
 });
 
 
@@ -156,22 +173,7 @@ app.post("/logOut", (req, res) => {
     res.redirect("/");
 });
 
-/*---------------user search----------------------
-app.get("/:customListName",function(req,res){
-    userPro.findOne({email:req.params.customListName},function(err,results){
-        if(!err){
-            if(!results){
-                res.redirect("/");
-            } else {
-                res.render("profile", {
-                    name: results.name,
-                    image: results.image
-                });
-            }
-        }
-    });
-    console.log(req.params.customListName);
-});*/
+
 
 app.listen(3000, () => {
     console.log("Server started!");
