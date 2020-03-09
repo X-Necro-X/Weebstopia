@@ -115,9 +115,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post("/logOut", (req, res) => {
-    req.session.destroy(function(){
-        res.clearCookie('connect.sid', { path: '/' });
-    });
+    req.session.destroy();
     res.redirect("/");
 });
 
