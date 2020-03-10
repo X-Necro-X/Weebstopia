@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const crypto = require('crypto');
 const MongoStore = require('connect-mongo')(session);
 
-// settings
+// server settings
 
 const app = express();
 mongoose.connect("mongodb+srv://admin-necro:2634662@accounts-0uu7d.mongodb.net/Users", {
@@ -26,26 +26,29 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
+app.use(express.static('public/log-in'));
+app.use(express.static('public/profile'));
 app.use(express.static('public/search'));
+app.use(express.static('public/sign-up'));
+app.use(express.static('public/upload'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
-// mongoDB settings
-
 const logIn = new mongoose.Schema({
     fullName: String,
     userName: String,
     email: String,
     password: String
 });
-const registrationDetail = mongoose.model("registrationDetail", logIn);
+const detail = mongoose.model("detail", logIn);
 
 // root route
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     if (req.session.uid)
-        res.render('profile');
+        res.render('profile', {
+            details: await findUser(req.session.uid)
+        });
     else
         res.render('index');
 });
@@ -59,7 +62,7 @@ app.get('/sign-up', (req, res) => {
 });
 
 app.post('/save-user', (req, res) => {
-    registrationDetail.findOne({
+    detail.findOne({
         userName: req.body.userName
     }, (err, user) => {
         if (user) {
@@ -68,11 +71,11 @@ app.post('/save-user', (req, res) => {
             });
         } else {
             const data = req.body;
-            registrationDetail.findOne({
+            detail.findOne({
                 email: data.email
             }, (err, user) => {
                 if (!user) {
-                    const newUser = new registrationDetail({
+                    const newUser = new detail({
                         fullName: data.fullName,
                         userName: data.userName,
                         email: data.email,
@@ -80,11 +83,13 @@ app.post('/save-user', (req, res) => {
                     });
                     newUser.save();
                     if (req.body.remember == "true") {
-                        req.session.uid = newUser.userName;
+                        req.session.uid = newUser._id;
                         req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
                         req.session.expires = 365 * 24 * 60 * 60 * 1000;
                     }
-                    res.render('profile');
+                    res.render('profile', {
+                        details: newUser
+                    });
                 } else {
                     res.render('log-in', {
                         message: "You already have an account!"
@@ -106,36 +111,49 @@ app.get("/log-in", (req, res) => {
 app.post('/check-user', (req, res) => {
     var password = req.body.pswrd;
     password = crypto.createHash('sha256').update(password).digest('hex').toString();
-    if (req.body.userName && password) {
-        registrationDetail.findOne({
-            userName: req.body.userName
-        }, (err, user) => {
-            if (user) {
-                if (user.password == password) {
-                    if (req.body.remember == "true") {
-                        req.session.uid = user.userName;
-                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-                        req.session.expires = 365 * 24 * 60 * 60 * 1000;
-                    }
-                    res.render('profile');
-                } else {
-                    res.render('log-in', {
-                        message: "Incorrect Password!"
-                    });
+    detail.findOne({
+        userName: req.body.userName
+    }, (err, user) => {
+        if (user) {
+            if (user.password == password) {
+                if (req.body.remember == "true") {
+                    req.session.uid = user._id;
+                    req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                    req.session.expires = 365 * 24 * 60 * 60 * 1000;
                 }
+                res.render('profile', {
+                    details: user
+                });
             } else {
-                res.render('sign-up', {
-                    message: "You have to sign up first"
+                res.render('log-in', {
+                    message: "Incorrect Password!"
                 });
             }
-        });
-    }
+        } else {
+            res.render('sign-up', {
+                message: "You have to sign up first!"
+            });
+        }
+    });
 });
 
 app.get("/log-out", (req, res) => {
     req.session.destroy();
     res.redirect("/");
 });
+
+// functions
+
+function findUser(uid) {
+    return new Promise((resolve, reject) => {
+        detail.findById(uid, (err, user) => {
+            if (err)
+                reject(err);
+            else
+                resolve(user);
+        });
+    });
+}
 
 // /*--------------search user-------------------*/
 
@@ -145,7 +163,7 @@ app.get("/log-out", (req, res) => {
 
 // app.post('/searchuser', (req, res) => {
 //     console.log(req.body.temp);
-//     registrationDetail.find({
+//     detail.find({
 //         fullName: new RegExp(req.body.temp, "i")
 //     }, function (err, user) {
 //         console.log(user);
@@ -160,13 +178,13 @@ app.get("/log-out", (req, res) => {
 //     registration.findOne({
 //         _id: req.body["hello"]
 //     }, function (err, user) {
-//         res.redirect("/" + registrationDetailfullName)
+//         res.redirect("/" + detailfullName)
 //         console.log(user);
 //     });
 // });
 
 // app.get("/:customListName", function (req, res) {
-//     registrationDetail.findOne({
+//     detail.findOne({
 //         fullName: req.params.customListName
 //     }, function (err, results) {
 //         if (!err) {
@@ -199,7 +217,7 @@ app.get("/log-out", (req, res) => {
 
 
 // app.get('/profile', (req, res) => {
-//     registrationDetail.findOne({
+//     detail.findOne({
 //         _id: req.session.uid
 //     }, (err, user) => {
 //         if (user) {
