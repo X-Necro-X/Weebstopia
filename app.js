@@ -1,9 +1,14 @@
+
+/*------------------------Require modules------------------------*/
+
 const express = require('express');
 const ejs = require("ejs");
 const session = require('express-session')
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 var crypto = require('crypto');
+
+/*------------------------Initialize Modules-------------------------*/
 
 const app = express();
 mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Users", {
@@ -17,24 +22,24 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
+app.use(express.static('public/upload'));
 
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+/*--------------Create schema for mongodb---------------------*/
+
 const loginUsers = new mongoose.Schema({
     email: String,
     password: String,
-    fullName: String
+    fullName:String,
+    image:String
 });
 const users = mongoose.model("user", loginUsers);
 
-const profileUsers = new mongoose.Schema({
-    email: String,
-    password: String,
-    fullName: String
-});
-const userPro = mongoose.model("userProfiles", profileUsers);
+
+/*------------register user--------------------*/
 
 
 function saveUser(data, res) {
@@ -54,6 +59,50 @@ function saveUser(data, res) {
     });
 
 }
+
+/*--------------search user-------------------*/
+
+
+app.post('/search', (req, res) => {
+    res.render('search');
+});
+
+app.post('/searchuser',(req,res)=>{
+    console.log(req.body.temp);
+    users.find({fullName: new RegExp(req.body.temp, "i")},function(err,user){
+            console.log(user);
+            res.send(user);
+    });
+});
+
+/*-------------------show profile-----------------------*/
+
+app.post('/showprofile',(req,res)=>{
+    console.log(req.body);
+    users.findOne({_id: req.body["hello"]},function(err,user){
+        res.redirect("/"+user.fullName)
+        console.log(user);
+});
+});
+
+app.get("/:customListName",function(req,res){
+    users.findOne({fullName:req.params.customListName},function(err,results){
+        if(!err){
+            if(!results){
+                res.redirect("/");
+            } else {
+                res.render("profile", {
+                    name: results.fullName,
+                    image: results.image
+                });
+            }
+        }
+    });
+    console.log(req.params.customListName);
+});
+
+
+/*---------------------sign up---------------------*/
 
 app.post('/sign-up', (req, res) => {
     res.render('sign-up');
@@ -77,11 +126,10 @@ app.get("/loginP", (req, res) => {
     res.sendFile(__dirname + "/signin.html");
 });
 
-app.get('/index', (req, res) => {
-    /*if(req.session.uid)
+app.get('/', (req, res) => {
+    if(req.session.uid)
     res.render('logout');
     else
-    res.render('index');*/
     res.render('index');
 });
 
@@ -154,6 +202,7 @@ app.get("/:customListName", function (req, res) {
     });
     console.log(req.params.customListName);
 });
+/*----------starting server-----------------*/
 
 app.listen(3000, () => {
     console.log("Server started!");
