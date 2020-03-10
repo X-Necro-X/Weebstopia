@@ -5,7 +5,8 @@ const ejs = require("ejs");
 const session = require('express-session')
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
-var crypto = require('crypto');
+const crypto = require('crypto');
+const MongoStore = require('connect-mongo')(session);
 
 // settings
 
@@ -16,8 +17,12 @@ mongoose.connect("mongodb+srv://admin-necro:2634662@accounts-0uu7d.mongodb.net/U
 });
 app.use(session({
     secret: "Anime is love, anime is life.",
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: true,
+    store: new MongoStore({
+        mongooseConnection: mongoose.connection,
+        touchAfter: 3600
+    })
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
@@ -45,7 +50,7 @@ app.get('/', (req, res) => {
         res.render('index');
 });
 
-// sign-up routes and functions
+// sign-up routes
 
 app.get('/sign-up', (req, res) => {
     res.render('sign-up', {
@@ -54,53 +59,43 @@ app.get('/sign-up', (req, res) => {
 });
 
 app.post('/save-user', (req, res) => {
-    var result = checkUserName(req.body.userName);
-    if (result == true)
-        res.render('sign-up', {
-            message: "User name already exists!"
-        });
-    else {
-        result = saveUser(req.body);
-        if (result == true)
-            res.render('profile');
-        else
-            res.render('log-in', {
-                message: "You already have an account!"
-            });
-    }
-});
-
-function checkUserName(uName) {
     userLogin.findOne({
-        userName: uName
+        userName: req.body.userName
     }, (err, user) => {
-        if (user)
-            return true;
-        else
-            return false;
-    });
-}
-
-function saveUser(data) {
-    userLogin.findOne({
-        email: data.email
-    }, (err, user) => {
-        if (!user) {
-            const newUser = new userLogin({
-                fullName: data.fullName,
-                userName: data.userName,
-                email: data.email,
-                password: crypto.createHash('sha256').update(data.password).digest('hex').toString()
+        if (user) {
+            res.render('sign-up', {
+                message: "User name already exists!"
             });
-            newUser.save();
-            return true;
         } else {
-            return false;
+            const data = req.body;
+            userLogin.findOne({
+                email: data.email
+            }, (err, user) => {
+                if (!user) {
+                    const newUser = new userLogin({
+                        fullName: data.fullName,
+                        userName: data.userName,
+                        email: data.email,
+                        password: crypto.createHash('sha256').update(data.password).digest('hex').toString()
+                    });
+                    newUser.save();
+                    if (req.body.remember == "true") {
+                        req.session.uid = newUser.userName;
+                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                        req.session.expires = 365 * 24 * 60 * 60 * 1000;
+                    }
+                    res.render('profile');
+                } else {
+                    res.render('log-in', {
+                        message: "You already have an account!"
+                    });
+                }
+            });
         }
     });
-}
+});
 
-// log-in routes and functions
+// log-in routes
 
 app.get("/log-in", (req, res) => {
     res.render("log-in", {
@@ -109,26 +104,25 @@ app.get("/log-in", (req, res) => {
 });
 
 app.post('/check-user', (req, res) => {
-    var uName = req.body.userName;
     var password = req.body.pswrd;
-    var check = req.body.remember;
     password = crypto.createHash('sha256').update(password).digest('hex').toString();
-    if (uName && password) {
+    if (req.body.userName && password) {
         userLogin.findOne({
-            userName: uName
+            userName: req.body.userName
         }, (err, user) => {
             if (user) {
                 if (user.password == password) {
-                    res.render('profile');
-                    if (check == "true") {
-                        req.session.cookie({
-                            maxAge: 365 * 24 * 60 * 60 * 1000
-                        });
+                    if (req.body.remember == "true") {
+                        req.session.uid = user.userName;
+                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+                        req.session.expires = 365 * 24 * 60 * 60 * 1000;
                     }
-                } else
+                    res.render('profile');
+                } else {
                     res.render('log-in', {
                         message: "Incorrect Password!"
                     });
+                }
             } else {
                 res.render('sign-up', {
                     message: "You have to sign up first"
