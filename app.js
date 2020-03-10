@@ -1,9 +1,14 @@
+
+/*------------------------Require modules------------------------*/
+
 const express = require('express');
 const ejs = require("ejs");
 const session = require('express-session')
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 var crypto = require('crypto');
+
+/*------------------------Initialize Modules-------------------------*/
 
 const app = express();
 mongoose.connect("mongodb+srv://terminator:testdb@accounts-0uu7d.mongodb.net/Users", {
@@ -23,6 +28,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+/*--------------Create schema for mongodb---------------------*/
+
 const loginUsers = new mongoose.Schema({
     email: String,
     password: String,
@@ -30,6 +37,9 @@ const loginUsers = new mongoose.Schema({
     image:String
 });
 const users = mongoose.model("user", loginUsers);
+
+
+/*------------register user--------------------*/
 
 
 function saveUser(data, res) {
@@ -75,7 +85,6 @@ app.post('/showprofile',(req,res)=>{
 });
 });
 
-/*---------------user search----------------------*/
 app.get("/:customListName",function(req,res){
     users.findOne({fullName:req.params.customListName},function(err,results){
         if(!err){
@@ -173,7 +182,7 @@ app.post("/logOut", (req, res) => {
     res.redirect("/");
 });
 
-
+/*----------starting server-----------------*/
 
 app.listen(3000, () => {
     console.log("Server started!");
