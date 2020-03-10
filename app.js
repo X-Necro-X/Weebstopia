@@ -129,10 +129,6 @@ app.post('/check-user', (req, res) => {
                 });
             }
         });
-    } else {
-        res.render('log-in', {
-            message: "Please fill both the fields!"
-        });
     }
 });
 
