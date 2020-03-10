@@ -129,9 +129,10 @@ app.post('/check-user', (req, res) => {
                     res.render('log-in', {
                         message: "Incorrect Password!"
                     });
-            }
-            else{
-                res.render('sign-up', { message: "You have to sign up first" });
+            } else {
+                res.render('sign-up', {
+                    message: "You have to sign up first"
+                });
             }
         });
     } else {
