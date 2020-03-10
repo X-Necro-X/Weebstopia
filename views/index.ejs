@@ -39,11 +39,9 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav pt-md-0 pt-3">
-            <a class="nav-item nav-link px-md-4">#</a>
-            <a class="nav-item nav-link px-md-4" id="search">Search</a>
-            <a class="nav-item nav-link px-md-4">#</a>
-          </div>
+          <form class="form-inline" style="position: absolute;right:180px;" action="/search" method="POST">
+            <button class="btn btn-outline-primary mr-sm-2" type="submit">Search User</button>
+          </form>
           <form class="form-inline" style="position: absolute;right:90px;" action="/loginP" method="POST">
             <button class="btn btn-outline-primary mr-sm-2" type="submit">Login</button>
           </form>

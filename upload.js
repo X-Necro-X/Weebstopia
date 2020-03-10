@@ -22,7 +22,7 @@ app.post('/',function(req,res){
             console.log(i);
             break;
         }
-        file.name="terminator"+filename.slice(index);
+        file.name="yagami"+filename.slice(index);
         file.mv("./upload/"+file.name,function(err){
             if(err)
             res.send("Error");
