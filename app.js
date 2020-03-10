@@ -39,7 +39,7 @@ const logIn = new mongoose.Schema({
     email: String,
     password: String
 });
-const userLogin = mongoose.model("userLogin", logIn);
+const registrationDetail = mongoose.model("registrationDetail", logIn);
 
 // root route
 
@@ -59,7 +59,7 @@ app.get('/sign-up', (req, res) => {
 });
 
 app.post('/save-user', (req, res) => {
-    userLogin.findOne({
+    registrationDetail.findOne({
         userName: req.body.userName
     }, (err, user) => {
         if (user) {
@@ -68,11 +68,11 @@ app.post('/save-user', (req, res) => {
             });
         } else {
             const data = req.body;
-            userLogin.findOne({
+            registrationDetail.findOne({
                 email: data.email
             }, (err, user) => {
                 if (!user) {
-                    const newUser = new userLogin({
+                    const newUser = new registrationDetail({
                         fullName: data.fullName,
                         userName: data.userName,
                         email: data.email,
@@ -107,7 +107,7 @@ app.post('/check-user', (req, res) => {
     var password = req.body.pswrd;
     password = crypto.createHash('sha256').update(password).digest('hex').toString();
     if (req.body.userName && password) {
-        userLogin.findOne({
+        registrationDetail.findOne({
             userName: req.body.userName
         }, (err, user) => {
             if (user) {
@@ -145,7 +145,7 @@ app.get("/log-out", (req, res) => {
 
 // app.post('/searchuser', (req, res) => {
 //     console.log(req.body.temp);
-//     userLogin.find({
+//     registrationDetail.find({
 //         fullName: new RegExp(req.body.temp, "i")
 //     }, function (err, user) {
 //         console.log(user);
@@ -157,16 +157,16 @@ app.get("/log-out", (req, res) => {
 
 // app.post('/showprofile', (req, res) => {
 //     console.log(req.body);
-//     userLogin.findOne({
+//     registration.findOne({
 //         _id: req.body["hello"]
 //     }, function (err, user) {
-//         res.redirect("/" + userLoginfullName)
+//         res.redirect("/" + registrationDetailfullName)
 //         console.log(user);
 //     });
 // });
 
 // app.get("/:customListName", function (req, res) {
-//     userLogin.findOne({
+//     registrationDetail.findOne({
 //         fullName: req.params.customListName
 //     }, function (err, results) {
 //         if (!err) {
@@ -199,7 +199,7 @@ app.get("/log-out", (req, res) => {
 
 
 // app.get('/profile', (req, res) => {
-//     userLogin.findOne({
+//     registrationDetail.findOne({
 //         _id: req.session.uid
 //     }, (err, user) => {
 //         if (user) {
