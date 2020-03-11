@@ -45,20 +45,25 @@ const detail = mongoose.model("detail", logIn);
 // root route
 
 app.get('/', async (req, res) => {
-    if (req.session.uid)
+    if (!req.session.uid)
+        res.render('index');
+    else
         res.render('profile', {
             details: await findUser(req.session.uid)
         });
-    else
-        res.render('index');
 });
 
 // sign-up routes
 
 app.get('/sign-up', (req, res) => {
-    res.render('sign-up', {
-        message: "Please Sign Up!"
-    });
+    if (!req.session.uid)
+        res.render('sign-up', {
+            message: "Please Sign Up!"
+        });
+    else
+        res.render('profile', {
+            details: await findUser(req.session.uid)
+        });
 });
 
 app.post('/save-user', (req, res) => {
@@ -103,9 +108,15 @@ app.post('/save-user', (req, res) => {
 // log-in routes
 
 app.get("/log-in", (req, res) => {
-    res.render("log-in", {
-        message: "Please Login to continue!"
-    });
+    if (!req.session.uid)
+        res.render("log-in", {
+            message: "Please Login to continue!"
+        });
+    else
+        res.render('profile', {
+            details: await findUser(req.session.uid)
+        });
+
 });
 
 app.post('/check-user', (req, res) => {
