@@ -94,12 +94,11 @@ app.post('/save-user', (req, res) => {
                         profilePic: "profile-pic-default.png"
                     });
                     newUser.save();
+                    req.session.uid = newUser._id;
+                    req.session.uun = newUser.userName;
+                    req.session.upp = newUser.profilePic;
                     if (req.body.remember == "true") {
-                        req.session.uid = newUser._id;
-                        req.session.uun = newUser.userName;
-                        req.session.upp = newUser.profilePic;
                         req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-                        req.session.expires = 365 * 24 * 60 * 60 * 1000;
                     }
                     res.render('profile', {
                         details: newUser
@@ -135,12 +134,11 @@ app.post('/check-user', (req, res) => {
     }, (err, user) => {
         if (user) {
             if (user.password == password) {
+                req.session.uid = user._id;
+                req.session.uun = user.userName;
+                req.session.upp = user.profilePic;
                 if (req.body.remember == "true") {
-                    req.session.uid = user._id;
-                    req.session.uun = user.userName;
-                    req.session.upp = user.profilePic;
                     req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-                    req.session.expires = 365 * 24 * 60 * 60 * 1000;
                 }
                 res.render('profile', {
                     details: user
@@ -166,7 +164,7 @@ app.get("/log-out", (req, res) => {
 // settings routes
 
 app.get('/settings', async (req, res) => {
-    if (!req.session.uid)
+    if (!req.session.uid && !req.session.cookie.maxAge)
         res.render("log-in", {
             message: "Please Login to continue!"
         });
@@ -182,70 +180,60 @@ app.post('/save-settings', async (req, res) => {
     const user = await findUser(req.session.uid);
     if (!(req.body.newp1 == "" && req.body.newp2 == "")) {
         if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password)
-            message += "Incorrect Password!<br />";
+            message += "Incorrect Password!...";
         else if (req.body.newp1 != req.body.newp2)
-            message += "Passwords do not match!<br />";
+            message += "Passwords do not match!...";
         else {
-            message += "Password updated successfully!<br />";
+            message += "Password updated successfully!...";
             user.password = crypto.createHash('sha256').update(req.body.newp1).digest('hex').toString();
         }
     }
     if (req.body.email != user.email) {
-        await detail.findOne({
+        var found = await detail.findOne({
             email: req.body.email
-        }).then((err, found) => {
-            if (found)
-                message += "Account with that e-mail already exists!<br />";
-            else {
-                message += "E-mail updated successfully!<br />";
-                user.email = req.body.email;
-            }
         });
+        if (found) {
+            message += "Account with that e-mail already exists!...";
+        } else {
+            message += "E-mail updated successfully!...";
+            user.email = req.body.email;
+        }
     }
     if (req.body.userName != user.userName) {
-        await detail.findOne({
+        var found = await detail.findOne({
             userName: req.body.userName
-        }).then((err, found) => {
-            if (found)
-                message += "Account with that user name already exists!<br />";
-            else {
-                message += "User name updated successfully!<br />";
-                user.userName = req.body.userName;
-                req.session.uun = req.body.userName;
-            }
         });
-    }
-    
-    console.log("req files", req.files);
-
-    if (req.files) {
-        console.log("inside", req.files.profilePic);
-
-        const pic = req.files.profilePic;
-        if (req.session.upp != "profile-pic-default.png") {
-            await fs.unlink(__dirname + "/public/upload/" + req.session.upp);
-            console.log("here3");
-
+        if (found) {
+            message += "Account with that user name already exists!...";
+        } else {
+            message += "User name updated successfully!...";
+            user.userName = req.body.userName;
+            req.session.uun = req.body.userName;
         }
+    }
+    if (req.files) {
+        const pic = req.files.profilePic;
+        if (req.session.upp != "profile-pic-default.png")
+            fs.unlink(__dirname + "/public/upload/" + req.session.upp, () => {});
         pic.name = "profile-pic-" + req.session.uun + "-" + pic.name;
-        console.log("pic name", pic.name);
-
         pic.mv(__dirname + "/public/upload/" + pic.name);
-        console.log("dir", __dirname + "/public/upload/" + pic.name);
-
-        message += "Profile picture updated successfully<br />";
+        message += "Profile picture updated successfully...";
         user.profilePic = pic.name;
         req.session.upp = pic.name;
     }
-    const newDetails = await detail.updateOne({
+    await detail.updateOne({
         _id: user._id
     }, user);
-    console.log("new", await findUser(req.session.uid));
-
     res.render('settings', {
         message: message,
         details: await findUser(req.session.uid)
     });
+});
+
+// search routes
+
+app.get('/search', (req, res) => {
+    res.render('search');
 });
 
 // functions
@@ -269,17 +257,15 @@ app.listen(3000, () => {
 
 
 
-// app.get('/search', (req, res) => {
-//     res.render('search');
-// });
-
-// app.post('/search-user',(req,res)=>{
-//     console.log(req.body.temp);
-//     users.find({fullName: new RegExp(req.body.temp, "i")},(err,user)=>{
-//             console.log(user);
-//             res.send(user);
-//     });
-// });
+app.post('/search-user', (req, res) => {
+    console.log(req.body.temp);
+    users.find({
+        fullName: new RegExp(req.body.temp, "i")
+    }, (err, user) => {
+        console.log(user);
+        res.send(user);
+    });
+});
 
 // app.post('/showprofile',(req,res)=>{
 //     console.log(req.body);

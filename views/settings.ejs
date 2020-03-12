@@ -15,17 +15,15 @@
 </head>
 
 <body>
-    <form method="POST" action="/save-settings">
+    <form method="POST" action="/save-settings" enctype="multipart/form-data">
         <p><%= message %></p>
         <div class="jumbotron">
             <center>
-                <div class="upload-btn">
                     <label>
                         <input type='file' name="profilePic" id="imgInp" />
                         <img id="blah" src="<%= details.profilePic %>" width=200 height=200
                             style="z-index:1;" alt="your image" />
                     </label>
-                </div>
                 <br />
                 <input type="text" name="userName" value="<%= details.userName %>" />
                 <br />
@@ -52,7 +50,6 @@
 </body>
 <script>
     function readURL(input) {
-        console.log($('#imgInp').val());
         
         if (input.files && input.files[0]) {
             var reader = new FileReader();
