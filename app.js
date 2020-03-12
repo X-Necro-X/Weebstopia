@@ -229,35 +229,28 @@ app.post('/save-settings', async (req, res) => {
 
 // search routes
 
-app.get('/search', (req, res) => {
+app.get('/search-user', (req, res) => {
     res.render('search');
 });
 
-app.post('/search', (req, res) => {
-    users.find({
-        fullName: new RegExp(req.body.temp, "i")
-    }, (err, user) => {
-        console.log(user);
-        res.send(user);
+app.post('/search-user', async (req, res) => {
+    const user = await detail.find({
+        fullName: new RegExp(req.body.userSearch, "i")
     });
+    res.send(user);
 });
 
-app.get("/users/:user-Name", (req, res) => {
-    users.findOne({
-        fullName: req.params.user - Name
-    }, (err, results) => {
-        if (!err) {
-            if (!results) {
-                res.redirect("/");
-            } else {
-                res.render("profile", {
-                    name: results.fullName,
-                    image: results.image
-                });
-            }
-        }
+app.get("/users/:userName", async (req, res) => {
+    console.log(req.params.userName);
+    
+    const user = await detail.findOne({
+        userName: req.params.userName
     });
-    console.log(req.params.customListName);
+    console.log(user);
+    
+    res.render("view-profile", {
+        details: user
+    });
 });
 
 // functions
