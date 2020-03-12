@@ -233,6 +233,33 @@ app.get('/search', (req, res) => {
     res.render('search');
 });
 
+app.post('/search', (req, res) => {
+    users.find({
+        fullName: new RegExp(req.body.temp, "i")
+    }, (err, user) => {
+        console.log(user);
+        res.send(user);
+    });
+});
+
+app.get("/users/:user-Name", (req, res) => {
+    users.findOne({
+        fullName: req.params.user - Name
+    }, (err, results) => {
+        if (!err) {
+            if (!results) {
+                res.redirect("/");
+            } else {
+                res.render("profile", {
+                    name: results.fullName,
+                    image: results.image
+                });
+            }
+        }
+    });
+    console.log(req.params.customListName);
+});
+
 // functions
 
 function findUser(uid) {
@@ -250,40 +277,4 @@ function findUser(uid) {
 
 app.listen(3000, () => {
     console.log("Server started!");
-});
-
-
-
-app.post('/search-user', (req, res) => {
-    console.log(req.body.temp);
-    users.find({
-        fullName: new RegExp(req.body.temp, "i")
-    }, (err, user) => {
-        console.log(user);
-        res.send(user);
-    });
-});
-
-app.post('/showprofile',(req,res)=>{
-    console.log(req.body);
-    users.findOne({_id: req.body["hello"]},(err,user)=>{
-        res.redirect("/"+user.fullName)
-        console.log(user);
-});
-});
-
-app.get("/:user-Name",(req,res)=>{
-    users.findOne({fullName:req.params.user-Name},(err,results)=>{
-        if(!err){
-            if(!results){
-                res.redirect("/");
-            } else {
-                res.render("profile", {
-                    name: results.fullName,
-                    image: results.image
-                });
-            }
-        }
-    });
-    console.log(req.params.customListName);
 });
