@@ -241,13 +241,9 @@ app.post('/search-user', async (req, res) => {
 });
 
 app.get("/users/:userName", async (req, res) => {
-    console.log(req.params.userName);
-    
     const user = await detail.findOne({
         userName: req.params.userName
-    });
-    console.log(user);
-    
+    });    
     res.render("view-profile", {
         details: user
     });

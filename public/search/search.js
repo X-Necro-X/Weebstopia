@@ -11,8 +11,8 @@ $(document).ready(function () {
     ti: "' />",
     ht: "<p>",
     tt: "</p>",
-    hb: "<button class='open' id='",
-    tb: "'>Open</button>"
+    hb: "<button onclick='viewProfile(\"",
+    tb: "\")'>viewProfile</button>"
   };
 
   $("#search-button").click(search);
@@ -49,11 +49,8 @@ $(document).ready(function () {
 
 });
 
-$('.open').click(() => {
-  console.log(this);
-  $.get('/users/' + $(this).attr('id'), (data) => {
-    console.log(data);
-
-    $('html').html(data);
+function viewProfile(userSearch) {
+  $.get('/users/' + userSearch, (data) => {
+    $('html').html(data)
   });
-});
+}
