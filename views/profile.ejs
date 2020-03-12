@@ -14,7 +14,7 @@
 
                 </div>
                 <div class="avatar">
-                    <img alt="" src="<%= details.userName %>.jpg">
+                    <img alt="" src="<%= details.profilePic %>">
                 </div>
                 <div class="info">
                     <div class="title">
@@ -23,6 +23,9 @@
                     <div class="desc">User Name: <%= details.userName %></div>
                     <div class="desc">E-mail: <%= details.email %></div>
                 </div>
+                <form class="form-inline" style="position: absolute;right:180px;" action="/search-user" method="GET">
+                    <button class="btn btn-outline-primary mr-sm-2" type="submit">Search User</button>
+                  </form>
                 <div class="bottom">
                     <a class="btn btn-primary btn-twitter btn-sm" href="https://twitter.com/webmaniac">
                         <i class="fa fa-twitter"></i>
@@ -44,5 +47,8 @@
     </div>
 </div>
 <form action="/log-out" method="get">
-<button type="submit">Log Out</button>
+    <button type="submit">Log Out</button>
+</form>
+<form action="/settings" method="get">
+    <button type="submit">Settings</button>
 </form>
