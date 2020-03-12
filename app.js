@@ -77,11 +77,11 @@ app.post('/save-user', (req, res) => {
     detail.findOne({
         userName: req.body.userName
     }, (err, user) => {
-        if (user) {
+        if (user)
             res.render('sign-up', {
                 message: "User name already exists!"
             });
-        } else {
+        else {
             detail.findOne({
                 email: req.body.email
             }, (err, user) => {
@@ -97,17 +97,15 @@ app.post('/save-user', (req, res) => {
                     req.session.uid = newUser._id;
                     req.session.uun = newUser.userName;
                     req.session.upp = newUser.profilePic;
-                    if (req.body.remember == "true") {
+                    if (req.body.remember == "true")
                         req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-                    }
                     res.render('profile', {
                         details: newUser
                     });
-                } else {
+                } else
                     res.render('log-in', {
                         message: "You already have an account!"
                     });
-                }
             });
         }
     });
@@ -148,11 +146,10 @@ app.post('/check-user', (req, res) => {
                     message: "Incorrect Password!"
                 });
             }
-        } else {
+        } else
             res.render('sign-up', {
                 message: "You have to sign up first!"
             });
-        }
     });
 });
 
@@ -164,7 +161,7 @@ app.get("/log-out", (req, res) => {
 // settings routes
 
 app.get('/settings', async (req, res) => {
-    if (!req.session.uid && !req.session.cookie.maxAge)
+    if (!req.session.uid)
         res.render("log-in", {
             message: "Please Login to continue!"
         });
@@ -192,9 +189,9 @@ app.post('/save-settings', async (req, res) => {
         var found = await detail.findOne({
             email: req.body.email
         });
-        if (found) {
+        if (found)
             message += "Account with that e-mail already exists!...";
-        } else {
+        else {
             message += "E-mail updated successfully!...";
             user.email = req.body.email;
         }
@@ -203,9 +200,9 @@ app.post('/save-settings', async (req, res) => {
         var found = await detail.findOne({
             userName: req.body.userName
         });
-        if (found) {
+        if (found)
             message += "Account with that user name already exists!...";
-        } else {
+        else {
             message += "User name updated successfully!...";
             user.userName = req.body.userName;
             req.session.uun = req.body.userName;
@@ -267,26 +264,26 @@ app.post('/search-user', (req, res) => {
     });
 });
 
-// app.post('/showprofile',(req,res)=>{
-//     console.log(req.body);
-//     users.findOne({_id: req.body["hello"]},(err,user)=>{
-//         res.redirect("/"+user.fullName)
-//         console.log(user);
-// });
-// });
+app.post('/showprofile',(req,res)=>{
+    console.log(req.body);
+    users.findOne({_id: req.body["hello"]},(err,user)=>{
+        res.redirect("/"+user.fullName)
+        console.log(user);
+});
+});
 
-// app.get("/:user-Name",(req,res)=>{
-//     users.findOne({fullName:req.params.user-Name},(err,results)=>{
-//         if(!err){
-//             if(!results){
-//                 res.redirect("/");
-//             } else {
-//                 res.render("profile", {
-//                     name: results.fullName,
-//                     image: results.image
-//                 });
-//             }
-//         }
-//     });
-//     console.log(req.params.customListName);
-// });
+app.get("/:user-Name",(req,res)=>{
+    users.findOne({fullName:req.params.user-Name},(err,results)=>{
+        if(!err){
+            if(!results){
+                res.redirect("/");
+            } else {
+                res.render("profile", {
+                    name: results.fullName,
+                    image: results.image
+                });
+            }
+        }
+    });
+    console.log(req.params.customListName);
+});
