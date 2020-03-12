@@ -7,6 +7,9 @@ const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 const crypto = require('crypto');
 const MongoStore = require('connect-mongo')(session);
+// const fs=require('fs');
+// const upload=require('express-fileupload');
+// const path = require('path');
 
 // server settings
 
@@ -28,9 +31,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public/index'));
 app.use(express.static('public/log-in'));
 app.use(express.static('public/profile'));
-app.use(express.static('public/search'));
 app.use(express.static('public/sign-up'));
-app.use(express.static('public/upload'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -41,6 +42,7 @@ const logIn = new mongoose.Schema({
     password: String
 });
 const detail = mongoose.model("detail", logIn);
+// app.use(upload());
 
 // root route
 
@@ -55,7 +57,7 @@ app.get('/', async (req, res) => {
 
 // sign-up routes
 
-app.get('/sign-up', (req, res) => {
+app.get('/sign-up', async (req, res) => {
     if (!req.session.uid)
         res.render('sign-up', {
             message: "Please Sign Up!"
@@ -107,7 +109,7 @@ app.post('/save-user', (req, res) => {
 
 // log-in routes
 
-app.get("/log-in", (req, res) => {
+app.get("/log-in", async (req, res) => {
     if (!req.session.uid)
         res.render("log-in", {
             message: "Please Login to continue!"
@@ -166,40 +168,113 @@ function findUser(uid) {
     });
 }
 
-// /*--------------search user-------------------*/
+// listen
 
-// app.get('/search-user', (req, res) => {
+app.listen(3000, () => {
+    console.log("Server started!");
+});
+
+// app.get('/settings',function(req,res){
+//     if(req.session.uid)
+//     {
+//         console.log(req.session);
+//         res.render("settings",{img:req.session.img});
+//     }
+//     else{
+//         res.redirect("/loginP");
+//     }
+// });
+// var file;
+// var flag=0;
+// app.post('/download',function(req,res){
+//     if(req.files)
+//     {
+//         console.log(req.files);
+//         file=req.files.myfile;
+//         file.name="d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa"+file.name;
+//         file.mv("./downloads/"+file.name,function(err){
+//             if(err)
+//             res.send("Error");
+//             else
+//             res.render('settings',{img:file.name});
+//         });
+//     }
+//     else{
+//         file=req.files;
+//     }
+// });
+
+
+// app.post('/saveprofile',function(req,res){
+//     if(!file)
+//     return setTimeout(function(){ res.redirect("/"); }, 3000);
+//     var index;
+//     for(i=file.name.length-1;i>=0;i--)
+//     if(file.name[i]=='.')
+//     {
+//         index=i;
+//         break;
+//     }
+//     var indextemp;
+//     var filenametemp=req.session.img;
+//     for(i=filenametemp.length-1;i>=0;i--)
+//     if(filenametemp[i]=='.')
+//     {
+//         indextemp=i;
+//         break;
+//     }
+//     file.name=req.session.img.slice(0,indextemp)+file.name.slice(index);
+//     fs.unlink('./public/upload/'+req.session.img, (err) => {
+//         if (err) throw err;
+//         console.log('successfully deleted image');
+//       });
+//       req.session.img=file.name;
+//     file.mv("./public/upload/"+file.name,function(err){
+//         if(err)
+//         res.send("Error");
+//         else
+//         res.render('settings',{img:file.name});
+//     });
+//     const directory = './downloads/';
+//     fs.readdir(directory, (err, files) => {
+//     if (err) throw err;
+
+//     for (const f of files) {
+//         fs.unlink(path.join(directory, f), err => {
+//         if (err) throw err;
+//         });
+//     }
+//     });
+//     users.updateOne({_id:req.session.uid}, { $set: { image: req.session.img } },function(err,user){
+//         console.log(user);
+//     });
+//     res.redirect("/");
+// });
+
+// app.post('/search', (req, res) => {
 //     res.render('search');
 // });
 
-// app.post('/searchuser', (req, res) => {
+// app.post('/searchuser',(req,res)=>{
 //     console.log(req.body.temp);
-//     detail.find({
-//         fullName: new RegExp(req.body.temp, "i")
-//     }, function (err, user) {
-//         console.log(user);
-//         res.send(user);
+//     users.find({fullName: new RegExp(req.body.temp, "i")},function(err,user){
+//             console.log(user);
+//             res.send(user);
 //     });
 // });
 
-// // /*-------------------show profile-----------------------*/
-
-// app.post('/showprofile', (req, res) => {
+// app.post('/showprofile',(req,res)=>{
 //     console.log(req.body);
-//     registration.findOne({
-//         _id: req.body["hello"]
-//     }, function (err, user) {
-//         res.redirect("/" + detailfullName)
+//     users.findOne({_id: req.body["hello"]},function(err,user){
+//         res.redirect("/"+user.fullName)
 //         console.log(user);
-//     });
+// });
 // });
 
-// app.get("/:customListName", function (req, res) {
-//     detail.findOne({
-//         fullName: req.params.customListName
-//     }, function (err, results) {
-//         if (!err) {
-//             if (!results) {
+// app.get("/:customListName",function(req,res){
+//     users.findOne({fullName:req.params.customListName},function(err,results){
+//         if(!err){
+//             if(!results){
 //                 res.redirect("/");
 //             } else {
 //                 res.render("profile", {
@@ -211,47 +286,3 @@ function findUser(uid) {
 //     });
 //     console.log(req.params.customListName);
 // });
-
-
-
-
-
-
-
-
-
-
-
-// /*------------register user--------------------*/
-
-
-
-
-// app.get('/profile', (req, res) => {
-//     detail.findOne({
-//         _id: req.session.uid
-//     }, (err, user) => {
-//         if (user) {
-
-//         }
-//     });
-// });
-
-// app.post('/upload', function (req, res) {
-//     if (!req.files || Object.keys(req.files).length === 0) {
-//         return res.status(400).send('No files were uploaded.');
-//     }
-//     let sampleFile = req.files.sampleFile;
-//     sampleFile.mv(__dirname + '/public/' + req.session.uid + '.jpg', function (err) {
-//         if (err)
-//             return res.status(500).send(err);
-
-//         res.redirect('/profile');
-//     });
-// });
-
-// listen
-
-app.listen(3000, () => {
-    console.log("Server started!");
-});
