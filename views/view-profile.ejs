@@ -1,0 +1,28 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<title><%= details.fullName %>'s Profile</title>
+<!------ Include the above in your HEAD tag ---------->
+<link rel="stylesheet" href="profile.css">
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+
+            <div class="card hovercard">
+                <div class="cardheader">
+
+                </div>
+                <div class="avatar">
+                    <img alt="" src="<%= details.profilePic %>">
+                </div>
+                <div class="info">
+                    <div class="title">
+                        <a target="_blank" href="#"><%= details.fullName %></a>
+                    </div>
+                    <div class="desc">User Name: <%= details.userName %></div>
+                    <div class="desc">E-mail: <%= details.email %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
