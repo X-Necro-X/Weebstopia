@@ -167,8 +167,8 @@ app.post('/check-user', (req, res) => {
     });
 });
 
-app.get('/log-out', (req, res) => {
-    req.session.destroy();
+app.get('/log-out', async (req, res) => {
+    await req.session.destroy();
     res.redirect('/');
 });
 
