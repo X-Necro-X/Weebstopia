@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const MongoStore = require('connect-mongo')(session);
 const upload = require('express-fileupload');
-const fs = require('fs');
+const fs = require('fs').promises;
 
 
 // -------------------------------------------------- server settings -------------------------------------------------- //
@@ -99,7 +99,7 @@ app.post('/save-user', (req, res) => {
         } else {
             detail.findOne({
                 email: req.body.email
-            }, async (err, user) => {
+            }, (err, user) => {
                 if (!user) {
                     const newUser = new detail({
                         fullName: req.body.fullName,
@@ -108,14 +108,16 @@ app.post('/save-user', (req, res) => {
                         password: crypto.createHash('sha256').update(req.body.password).digest('hex').toString(),
                         profilePic: 'profile-pic-default.png'
                     });
-                    await newUser.save();
+                    newUser.save();
                     req.session.uid = newUser._id;
                     req.session.uun = newUser.userName;
                     req.session.upp = newUser.profilePic;
                     if (req.body.remember == 'true') {
                         req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
                     }
-                    res.redirect('/');
+                    req.session.save(() => {
+                        res.redirect('/');
+                    });
                 } else {
                     res.render('log-in', {
                         message: 'You already have an account!',
@@ -156,7 +158,9 @@ app.post('/check-user', (req, res) => {
             if (req.body.remember == 'true') {
                 req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
             }
-            res.redirect('/');
+            req.session.save(() => {
+                res.redirect('/');
+            });
         } else {
             res.render('log-in', {
                 message: 'Incorrect user name or password!',
@@ -167,9 +171,10 @@ app.post('/check-user', (req, res) => {
     });
 });
 
-app.get('/log-out', async (req, res) => {
-    await req.session.destroy();
-    res.redirect('/');
+app.get('/log-out', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
 });
 
 
@@ -182,7 +187,7 @@ app.get('/settings', (req, res) => {
     } else {
         detail.findById(req.session.uid, (err, user) => {
             res.render('settings', {
-                message: 'Account Settings',
+                message: ['Account Settings'],
                 bg: 'bg-light',
                 text: 'text-secondary',
                 details: user
@@ -213,82 +218,67 @@ app.post('/save-settings', async (req, res) => {
         }
     }
     if (req.body.email != user.email) {
-        await detail.findOne({
+        const found = await detail.findOne({
             email: req.body.email
-        }, (err, found) => {
-            if (found) {
-                message.push('Account with that e-mail already exists!');
-                bg.push('bg-danger');
-                text.push('text-light');
-            } else {
-                message.push('E-mail updated successfully!');
-                bg.push('bg-success');
-                text.push('text-light');
-                user.email = req.body.email;
-            }
         });
+        if (found) {
+            message.push('Account with that e-mail already exists!');
+            bg.push('bg-danger');
+            text.push('text-light');
+        } else {
+            message.push('E-mail updated successfully!');
+            bg.push('bg-success');
+            text.push('text-light');
+            user.email = req.body.email;
+        }
     }
     if (req.body.userName != user.userName) {
-        await detail.findOne({
+        const found = await detail.findOne({
             userName: req.body.userName
-        }, (err, found) => {
-            if (found) {
-                message.push('Account with that user name already exists!');
-                bg.push('bg-danger');
-                text.push('text-light');
-            } else {
-                message.push('User name updated successfully!');
-                bg.push('bg-success');
-                text.push('text-light');
-                user.userName = req.body.userName;
-                req.session.uun = req.body.userName;
-            }
         });
+        if (found) {
+            message.push('Account with that user name already exists!');
+            bg.push('bg-danger');
+            text.push('text-light');
+        } else {
+            message.push('User name updated successfully!');
+            bg.push('bg-success');
+            text.push('text-light');
+            user.userName = req.body.userName;
+        }
     }
     if (req.files) {
         const pic = req.files.profilePic;
         if (req.session.upp != 'profile-pic-default.png') {
-            fs.unlink(__dirname + '/public/upload/' + req.session.upp, async (err) => {
-                if (err) {
-                    message.push('Can not update profile picture!');
-                    bg.push('bg-danger');
-                    text.push('text-light');
-                } else {
-                    pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-                    await pic.mv(__dirname + '/public/upload/' + pic.name);
-                    message.push('Profile picture updated successfully!');
-                    bg.push('bg-success');
-                    text.push('text-light');
-                    user.profilePic = pic.name;
-                    req.session.upp = pic.name;
-                }
-            });
-        } else {
-            pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-            await pic.mv(__dirname + '/public/upload/' + pic.name);
-            message.push('Profile picture updated successfully!');
-            bg.push('bg-success');
-            text.push('text-light');
-            user.profilePic = pic.name;
-            req.session.upp = pic.name;
+            fs.unlink(__dirname + '/public/upload/' + req.session.upp);
         }
+        pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
+        await pic.mv(__dirname + '/public/upload/' + pic.name);
+        message.push('Profile picture updated successfully!');
+        bg.push('bg-success');
+        text.push('text-light');
+        user.profilePic = pic.name;
     }
     await detail.updateOne({
         _id: user._id
     }, user);
-    detail.findById(req.session.uid, (err, user) => {
-        res.render('settings', {
-            message: message,
-            bg: bg,
-            text: text,
-            details: user
+    req.session.upp = user.profilePic;
+    req.session.uun = user.userName;
+    req.session.save(() => {
+        detail.findById(req.session.uid, (err, user) => {
+            res.render('settings', {
+                message: message,
+                bg: bg,
+                text: text,
+                details: user
+            });
         });
     });
 });
 
 app.post('/delete-account', async (req, res) => {
     if (req.session.upp != 'profile-pic-default.png') {
-        fs.unlink(__dirname + '/public/upload/' + req.session.upp, () => {});
+        fs.unlink(__dirname + '/public/upload/' + req.session.upp);
     }
     await detail.findByIdAndDelete(req.session.uid);
     res.redirect('/log-out');

@@ -17,13 +17,13 @@
 <body>
     <form method="POST" action="/save-settings" enctype="multipart/form-data">
         <% for(i=0;i<message.length;i++) { %>
-        <p class="<%= bg %> <%= text %>"><%= message %></p>
+        <p class="<%= bg[i] %> <%= text[i] %>"><%= message[i] %></p>
         <%}%>
         <div class="jumbotron">
             <center>
                 <label>
                     <input type='file' name="profilePic" id="imgInp" />
-                    <img id="blah" src="<%= details.profilePic %>" width=200 height=200 style="z-index:1;"
+                    <img id="blah" src="../<%= details.profilePic %>" width=200 height=200 style="z-index:1;"
                         alt="your image" />
                 </label>
                 <br />
