@@ -16,7 +16,9 @@
 
 <body>
     <form method="POST" action="/save-settings" enctype="multipart/form-data">
-        <h1 class="<%= bg %> <%= text %>"><%= message %></h1>
+        <% for(i=0;i<message.length;i++) { %>
+        <p class="<%= bg %> <%= text %>"><%= message %></p>
+        <%}%>
         <div class="jumbotron">
             <center>
                 <label>

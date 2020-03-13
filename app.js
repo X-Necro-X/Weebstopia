@@ -195,88 +195,87 @@ app.post('/save-settings', async (req, res) => {
     var message = [],
         bg = [],
         text = [];
-    await detail.findById(req.session.uid, (err, user) => {
-        if (!(req.body.newp1 == '' && req.body.newp2 == '')) {
-            if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password) {
-                message.push('Incorrect Password!');
-                bg.push('bg-danger');
-                text.push('text-light');
-            } else if (req.body.newp1 != req.body.newp2) {
-                message.push('Passwords do not match!');
+    constZ user = await detail.findById(req.session.uid);
+    if (!(req.body.newp1 == '' && req.body.newp2 == '')) {
+        if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password) {
+            message.push('Incorrect Password!');
+            bg.push('bg-danger');
+            text.push('text-light');
+        } else if (req.body.newp1 != req.body.newp2) {
+            message.push('Passwords do not match!');
+            bg.push('bg-danger');
+            text.push('text-light');
+        } else {
+            message.push('Password updated successfully!');
+            bg.push('bg-success');
+            text.push('text-light');
+            user.password = crypto.createHash('sha256').update(req.body.newp1).digest('hex').toString();
+        }
+    }
+    if (req.body.email != user.email) {
+        detail.findOne({
+            email: req.body.email
+        }, (err, found) => {
+            if (found) {
+                message.push('Account with that e-mail already exists!');
                 bg.push('bg-danger');
                 text.push('text-light');
             } else {
-                message.push('Password updated successfully!');
+                message.push('E-mail updated successfully!');
                 bg.push('bg-success');
                 text.push('text-light');
-                user.password = crypto.createHash('sha256').update(req.body.newp1).digest('hex').toString();
+                user.email = req.body.email;
             }
-        }
-        if (req.body.email != user.email) {
-            detail.findOne({
-                email: req.body.email
-            }, (err, found) => {
-                if (found) {
-                    message.push('Account with that e-mail already exists!');
-                    bg.push('bg-danger');
-                    text.push('text-light');
-                } else {
-                    message.push('E-mail updated successfully!');
-                    bg.push('bg-success');
-                    text.push('text-light');
-                    user.email = req.body.email;
-                }
-            });
-        }
-        if (req.body.userName != user.userName) {
-            detail.findOne({
-                userName: req.body.userName
-            }, (err, found) => {
-                if (found) {
-                    message.push('Account with that user name already exists!');
-                    bg.push('bg-danger');
-                    text.push('text-light');
-                } else {
-                    message.push('User name updated successfully!');
-                    bg.push('bg-success');
-                    text.push('text-light');
-                    user.userName = req.body.userName;
-                    req.session.uun = req.body.userName;
-                }
-            });
-        }
-        if (req.files) {
-            const pic = req.files.profilePic;
-            if (req.session.upp != 'profile-pic-default.png') {
-                fs.unlink(__dirname + '/public/upload/' + req.session.upp, (err) => {
-                    if (err) {
-                        message.push('Can not update profile picture!');
-                        bg.push('bg-danger');
-                        text.push('text-light');
-                    } else {
-                        pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-                        pic.mv(__dirname + '/public/upload/' + pic.name);
-                        message.push('Profile picture updated successfully!');
-                        bg.push('bg-success');
-                        text.push('text-light');
-                        user.profilePic = pic.name;
-                        req.session.upp = pic.name;
-                    }
-                });
+        });
+    }
+    if (req.body.userName != user.userName) {
+        detail.findOne({
+            userName: req.body.userName
+        }, (err, found) => {
+            if (found) {
+                message.push('Account with that user name already exists!');
+                bg.push('bg-danger');
+                text.push('text-light');
             } else {
-                pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-                pic.mv(__dirname + '/public/upload/' + pic.name);
-                message.push('Profile picture updated successfully!');
+                message.push('User name updated successfully!');
                 bg.push('bg-success');
                 text.push('text-light');
-                user.profilePic = pic.name;
-                req.session.upp = pic.name;
+                user.userName = req.body.userName;
+                req.session.uun = req.body.userName;
             }
+        });
+    }
+    if (req.files) {
+        const pic = req.files.profilePic;
+        if (req.session.upp != 'profile-pic-default.png') {
+            fs.unlink(__dirname + '/public/upload/' + req.session.upp, (err) => {
+                if (err) {
+                    message.push('Can not update profile picture!');
+                    bg.push('bg-danger');
+                    text.push('text-light');
+                } else {
+                    pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
+                    pic.mv(__dirname + '/public/upload/' + pic.name);
+                    message.push('Profile picture updated successfully!');
+                    bg.push('bg-success');
+                    text.push('text-light');
+                    user.profilePic = pic.name;
+                    req.session.upp = pic.name;
+                }
+            });
+        } else {
+            pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
+            pic.mv(__dirname + '/public/upload/' + pic.name);
+            message.push('Profile picture updated successfully!');
+            bg.push('bg-success');
+            text.push('text-light');
+            user.profilePic = pic.name;
+            req.session.upp = pic.name;
         }
-        detail.updateOne({
-            _id: user._id
-        }, user);
-    });
+    }
+    await detail.updateOne({
+        _id: user._id
+    }, user);
     detail.findById(req.session.uid, (err, user) => {
         res.render('settings', {
             message: message,
