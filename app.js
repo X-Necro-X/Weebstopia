@@ -99,7 +99,7 @@ app.post('/save-user', (req, res) => {
         } else {
             detail.findOne({
                 email: req.body.email
-            }, (err, user) => {
+            }, async (err, user) => {
                 if (!user) {
                     const newUser = new detail({
                         fullName: req.body.fullName,
@@ -108,7 +108,7 @@ app.post('/save-user', (req, res) => {
                         password: crypto.createHash('sha256').update(req.body.password).digest('hex').toString(),
                         profilePic: 'profile-pic-default.png'
                     });
-                    newUser.save();
+                    await newUser.save();
                     req.session.uid = newUser._id;
                     req.session.uun = newUser.userName;
                     req.session.upp = newUser.profilePic;
@@ -213,7 +213,7 @@ app.post('/save-settings', async (req, res) => {
         }
     }
     if (req.body.email != user.email) {
-        detail.findOne({
+        await detail.findOne({
             email: req.body.email
         }, (err, found) => {
             if (found) {
@@ -229,7 +229,7 @@ app.post('/save-settings', async (req, res) => {
         });
     }
     if (req.body.userName != user.userName) {
-        detail.findOne({
+        await detail.findOne({
             userName: req.body.userName
         }, (err, found) => {
             if (found) {
@@ -255,7 +255,7 @@ app.post('/save-settings', async (req, res) => {
                     text.push('text-light');
                 } else {
                     pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-                    pic.mv(__dirname + '/public/upload/' + pic.name);
+                    await pic.mv(__dirname + '/public/upload/' + pic.name);
                     message.push('Profile picture updated successfully!');
                     bg.push('bg-success');
                     text.push('text-light');
@@ -265,7 +265,7 @@ app.post('/save-settings', async (req, res) => {
             });
         } else {
             pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
-            pic.mv(__dirname + '/public/upload/' + pic.name);
+            await pic.mv(__dirname + '/public/upload/' + pic.name);
             message.push('Profile picture updated successfully!');
             bg.push('bg-success');
             text.push('text-light');
