@@ -71,7 +71,7 @@
 <body class="text-center">
     <form class="form-signup" action="/save-user" method="POST">
         <img class="mb-4" src="midoriya.png" alt="W" width="75" height="75">
-        <h1 class="h3 mb-3 font-weight-normal"><%= message %></h1>
+        <h1 class="h3 mb-3 font-weight-normal <%= bg %> <%= text %>"><%= message %></h1>
 
         <label for="inputFullName" class="sr-only">Full Name</label>
         <input type="text" name="fullName" class="form-control" placeholder="Full Name" required autocomplete="off">
