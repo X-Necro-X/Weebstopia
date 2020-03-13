@@ -4,16 +4,6 @@ $(document).ready(function () {
 
   var content = "";
   var userSearch;
-  const object = {
-    hd: "<div class='list-group col-2'>",
-    td: "</div>",
-    hi: "<img src='",
-    ti: "' />",
-    ht: "<p>",
-    tt: "</p>",
-    hb: "<button onclick='viewProfile(\"",
-    tb: "\")'>viewProfile</button>"
-  };
 
   $("#search-button").click(search);
   $("#search-box").keypress(function (event) {
@@ -38,7 +28,7 @@ $(document).ready(function () {
       $("#display-container").html("");
       $("#display-container").addClass("row");
       data.forEach(function (item) {
-        content += object.hd + object.hi + item.profilePic + object.ti + object.ht + item.userName + object.tt + object.hb + item.userName + object.tb + object.td;
+        content += "<a class='col-2' href='/users/" + item.userName + "'> <img height='250' width='250' src='" + item.profilePic + "' /> <br> <p>" + item.userName + "</p> </a>";
       });
       $("#loader").hide(250);
       $("#display-container").append(content);
@@ -48,9 +38,3 @@ $(document).ready(function () {
   }
 
 });
-
-function viewProfile(userSearch) {
-  $.get('/users/' + userSearch, (data) => {
-    $('html').html(data)
-  });
-}
