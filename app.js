@@ -30,6 +30,7 @@ app.use(session({
     })
 }));
 app.set('view engine', 'ejs');
+app.use(express.static('public'));
 app.use(express.static('public/index'));
 app.use(express.static('public/log-in'));
 app.use(express.static('public/profile'));
@@ -77,8 +78,8 @@ app.get('/', (req, res) => {
 app.get('/sign-up', (req, res) => {
     if (!req.session.uid) {
         res.render('sign-up', {
-            message: 'Please Sign Up!',
-            bg: 'bg-light',
+            message: '',
+            bg: 'bg-white',
             text: 'text-secondary'
         });
     } else {
@@ -94,7 +95,7 @@ app.post('/save-user', (req, res) => {
             res.render('sign-up', {
                 message: 'User name already exists!',
                 bg: 'bg-danger',
-                text: 'text-light'
+                text: 'text-white'
             });
         } else {
             detail.findOne({
@@ -122,7 +123,7 @@ app.post('/save-user', (req, res) => {
                     res.render('log-in', {
                         message: 'You already have an account!',
                         bg: 'bg-warning',
-                        text: 'text-light'
+                        text: 'text-white'
                     });
                 }
             });
@@ -138,7 +139,7 @@ app.get('/log-in', (req, res) => {
     if (!req.session.uid) {
         res.render('log-in', {
             message: 'Please Login!',
-            bg: 'bg-light',
+            bg: 'bg-white',
             text: 'text-secondary'
         });
     } else {
@@ -165,7 +166,7 @@ app.post('/check-user', (req, res) => {
             res.render('log-in', {
                 message: 'Incorrect user name or password!',
                 bg: 'bg-danger',
-                text: 'text-light'
+                text: 'text-white'
             });
         }
     });
@@ -188,7 +189,7 @@ app.get('/settings', (req, res) => {
         detail.findById(req.session.uid, (err, user) => {
             res.render('settings', {
                 message: ['Account Settings'],
-                bg: 'bg-light',
+                bg: 'bg-white',
                 text: 'text-secondary',
                 details: user
             });
@@ -205,15 +206,15 @@ app.post('/save-settings', async (req, res) => {
         if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password) {
             message.push('Incorrect Password!');
             bg.push('bg-danger');
-            text.push('text-light');
+            text.push('text-white');
         } else if (req.body.newp1 != req.body.newp2) {
             message.push('Passwords do not match!');
             bg.push('bg-danger');
-            text.push('text-light');
+            text.push('text-white');
         } else {
             message.push('Password updated successfully!');
             bg.push('bg-success');
-            text.push('text-light');
+            text.push('text-white');
             user.password = crypto.createHash('sha256').update(req.body.newp1).digest('hex').toString();
         }
     }
@@ -224,11 +225,11 @@ app.post('/save-settings', async (req, res) => {
         if (found) {
             message.push('Account with that e-mail already exists!');
             bg.push('bg-danger');
-            text.push('text-light');
+            text.push('text-white');
         } else {
             message.push('E-mail updated successfully!');
             bg.push('bg-success');
-            text.push('text-light');
+            text.push('text-white');
             user.email = req.body.email;
         }
     }
@@ -239,11 +240,11 @@ app.post('/save-settings', async (req, res) => {
         if (found) {
             message.push('Account with that user name already exists!');
             bg.push('bg-danger');
-            text.push('text-light');
+            text.push('text-white');
         } else {
             message.push('User name updated successfully!');
             bg.push('bg-success');
-            text.push('text-light');
+            text.push('text-white');
             user.userName = req.body.userName;
         }
     }
@@ -256,7 +257,7 @@ app.post('/save-settings', async (req, res) => {
         await pic.mv(__dirname + '/public/upload/' + pic.name);
         message.push('Profile picture updated successfully!');
         bg.push('bg-success');
-        text.push('text-light');
+        text.push('text-white');
         user.profilePic = pic.name;
     }
     await detail.updateOne({

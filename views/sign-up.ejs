@@ -1,100 +1,89 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Sign Up</title>
-
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!-- Custom styles for this template -->
-    <style>
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            display: -ms-flexbox;
-            display: -webkit-box;
-            display: flex;
-            -ms-flex-align: center;
-            -ms-flex-pack: center;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            padding-top: 40px;
-            padding-bottom: 40px;
-            background-color: #f5f5f5;
-        }
-
-        .form-signup {
-            width: 100%;
-            max-width: 330px;
-            padding: 15px;
-            margin: 0 auto;
-        }
-
-        .form-signup .form-control {
-            position: relative;
-            box-sizing: border-box;
-            height: auto;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .form-signup .form-control:focus {
-            z-index: 2;
-        }
-
-        .form-signup input[type="email"],
-        .form-signup input[type="text"] {
-            margin-bottom: -1px;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-
-        .form-signup input[type="password"] {
-            margin-bottom: 10px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-    </style>
+  <title>Weebstopia</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes">
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="text-center">
-    <form class="form-signup" action="/save-user" method="POST">
-        <img class="mb-4" src="midoriya.png" alt="W" width="75" height="75">
-        <h1 class="h3 mb-3 font-weight-normal <%= bg %> <%= text %>"><%= message %></h1>
-
-        <label for="inputFullName" class="sr-only">Full Name</label>
-        <input type="text" name="fullName" class="form-control" placeholder="Full Name" required autocomplete="off">
-
-        <label for="inputUserName" class="sr-only">User Name</label>
-        <input type="text" name="userName" class="form-control" placeholder="User Name" required autocomplete="off">
-
-        <label for="inputEmail" class="sr-only">Email address</label>
-        <input type="email" name="email" class="form-control" placeholder="Email address" required autocomplete="off">
-
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" name="password" class="form-control" placeholder="Password" required autocomplete="off">
-
-        <input type="checkbox" value="true" name="remember"> Remember me
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
-        <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
-    </form>
-    <form action="/log-in" method="get">
-        <button type="submit">
-            Log In
-        </button>
-    </form>
+<body>
+  <div id="app">
+    <div class="_452c3ec4 d68c66a8">
+      <div class="_75ce47e7">
+        <main>
+          <header>
+            <a href="/">
+              <img src="Weebstopia.png" alt="Weebstopia">
+            </a>
+          </header>
+          <div class="_94d452dc">
+            <section class="_2b1f4808 bg-white br3">
+              <div>
+                <form method="POST" action="/save-user" class="ma0">
+                  <h2 class="aa630ec5 f3 fw6 pb3 pt0 mt0 mb3 black-70 b--black-10 bb">Sign Up</h2>
+                  <div>
+                    <p class="<%= bg %> <%= text %>"><%= message %></p>
+                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_fullname">
+                      Full Name
+                    </label>
+                    <input type="text"
+                      class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="fullName"
+                      value="" autofocus required>
+                  </div>
+                  <div>
+                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_email">
+                      Email
+                    </label>
+                    <input type="email"
+                      class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="email"
+                      value="" required>
+                  </div>
+                  <div>
+                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_name">
+                      Username
+                    </label>
+                    <input type="text"
+                      class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="userName"
+                      pattern="[a-zA-Z0-9]+" title="Only alpha-numeric character are allowed!" value="" required>
+                  </div>
+                  <div>
+                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_password">
+                      Password
+                    </label>
+                    <input type="password" minlength="6" title="Passwords should be longer than 6 characters!"
+                      class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="password"
+                      value="" required>
+                  </div>
+                  <div>
+                    <label for="remember_me">
+                      <input type="checkbox" value="true" name="remember"> Remember me
+                    </label>
+                  </div>
+                  <div>
+                    <p class="_77b93cf4 black-80 lh-copy">
+                      <span class="_0bb7ba4f fw6 black-70">Make sure your:</span>
+                    </p>
+                    <ul class="dd5d12f9 mt3 mb4 lh-copy black-60">
+                      <li>Password is longer than 6 characters</li>
+                      <li>User name does not contain any alpha-numeric characters</li>
+                    </ul>
+                  </div>
+                  <button type="submit"
+                    class="_24a1e9c7 dab9924c br2 pv2 ph3 fw5 f5 tc button button-reset pointer ma2 truncate ml0 no-underline e64d5a00 w-100">Sign
+                    Up
+                  </button>
+                </form>
+                <a href="/log-in" class="_6126477b db center tc mt3 mb2 f5 fw6 black-50 hover-black-80">or, Login
+                </a>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
