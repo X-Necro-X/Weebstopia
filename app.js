@@ -263,6 +263,14 @@ app.post('/save-settings', async (req, res) => {
                         req.session.upp = pic.name;
                     }
                 });
+            } else {
+                pic.name = 'profile-pic-' + req.session.uun + '-' + pic.name;
+                pic.mv(__dirname + '/public/upload/' + pic.name);
+                message.push('Profile picture updated successfully!');
+                bg.push('bg-success');
+                text.push('text-light');
+                user.profilePic = pic.name;
+                req.session.upp = pic.name;
             }
         }
         detail.updateOne({
