@@ -248,7 +248,7 @@ app.post('/save-settings', async (req, res) => {
     if (req.files) {
         const pic = req.files.profilePic;
         if (req.session.upp != 'profile-pic-default.png') {
-            fs.unlink(__dirname + '/public/upload/' + req.session.upp, (err) => {
+            fs.unlink(__dirname + '/public/upload/' + req.session.upp, async (err) => {
                 if (err) {
                     message.push('Can not update profile picture!');
                     bg.push('bg-danger');
