@@ -195,7 +195,7 @@ app.post('/save-settings', async (req, res) => {
     var message = [],
         bg = [],
         text = [];
-    constZ user = await detail.findById(req.session.uid);
+    const user = await detail.findById(req.session.uid);
     if (!(req.body.newp1 == '' && req.body.newp2 == '')) {
         if (crypto.createHash('sha256').update(req.body.oldp).digest('hex').toString() != user.password) {
             message.push('Incorrect Password!');
