@@ -58,14 +58,13 @@ app.use(upload({
 // -------------------------------------------------- root route -------------------------------------------------- //
 
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
     if (!req.session.uid) {
         res.render('index');
     } else {
-        detail.findById(req.session.uid, (err, user) => {
-            res.render('profile', {
-                details: user
-            });
+        const user = await detail.findById(req.session.uid);
+        res.render('profile', {
+            details: user
         });
     }
 });
@@ -86,46 +85,44 @@ app.get('/sign-up', (req, res) => {
     }
 });
 
-app.post('/save-user', (req, res) => {
-    detail.findOne({
+app.post('/save-user', async (req, res) => {
+    var user = await detail.findOne({
         userName: req.body.userName
-    }, (err, user) => {
-        if (user) {
-            res.render('sign-up', {
-                message: 'User name already exists!',
-                bg: 'bg-danger',
+    });
+    if (user) {
+        res.render('sign-up', {
+            message: 'User name already exists!',
+            bg: 'bg-danger',
+            text: 'text-light'
+        });
+    } else {
+        var user = await detail.findOne({
+            email: req.body.email
+        });
+        if (!user) {
+            const newUser = new detail({
+                fullName: req.body.fullName,
+                userName: req.body.userName,
+                email: req.body.email,
+                password: crypto.createHash('sha256').update(req.body.password).digest('hex').toString(),
+                profilePic: 'profile-pic-default.png'
+            });
+            newUser.save();
+            req.session.uid = newUser._id;
+            req.session.uun = newUser.userName;
+            req.session.upp = newUser.profilePic;
+            if (req.body.remember == 'true') {
+                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+            }
+            res.redirect('/');
+        } else {
+            res.render('log-in', {
+                message: 'You already have an account!',
+                bg: 'bg-warning',
                 text: 'text-light'
             });
-        } else {
-            detail.findOne({
-                email: req.body.email
-            }, (err, user) => {
-                if (!user) {
-                    const newUser = new detail({
-                        fullName: req.body.fullName,
-                        userName: req.body.userName,
-                        email: req.body.email,
-                        password: crypto.createHash('sha256').update(req.body.password).digest('hex').toString(),
-                        profilePic: 'profile-pic-default.png'
-                    });
-                    newUser.save();
-                    req.session.uid = newUser._id;
-                    req.session.uun = newUser.userName;
-                    req.session.upp = newUser.profilePic;
-                    if (req.body.remember == 'true') {
-                        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-                    }
-                    res.redirect('/');
-                } else {
-                    res.render('log-in', {
-                        message: 'You already have an account!',
-                        bg: 'bg-warning',
-                        text: 'text-light'
-                    });
-                }
-            });
         }
-    });
+    }
 });
 
 
@@ -144,27 +141,26 @@ app.get('/log-in', (req, res) => {
     }
 });
 
-app.post('/check-user', (req, res) => {
+app.post('/check-user', async (req, res) => {
     const password = crypto.createHash('sha256').update(req.body.password).digest('hex').toString();
-    detail.findOne({
+    const user = await detail.findOne({
         userName: req.body.userName
-    }, (err, user) => {
-        if (user && user.password == password) {
-            req.session.uid = user._id;
-            req.session.uun = user.userName;
-            req.session.upp = user.profilePic;
-            if (req.body.remember == 'true') {
-                req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-            }
-            res.redirect('/');
-        } else {
-            res.render('log-in', {
-                message: 'Incorrect user name or password!',
-                bg: 'bg-danger',
-                text: 'text-light'
-            });
-        }
     });
+    if (user && user.password == password) {
+        req.session.uid = user._id;
+        req.session.uun = user.userName;
+        req.session.upp = user.profilePic;
+        if (req.body.remember == 'true') {
+            req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+        }
+        res.redirect('/');
+    } else {
+        res.render('log-in', {
+            message: 'Incorrect user name or password!',
+            bg: 'bg-danger',
+            text: 'text-light'
+        });
+    }
 });
 
 app.get('/log-out', (req, res) => {
@@ -176,17 +172,16 @@ app.get('/log-out', (req, res) => {
 // -------------------------------------------------- settings routes -------------------------------------------------- //
 
 
-app.get('/settings', (req, res) => {
+app.get('/settings', async (req, res) => {
     if (!req.session.uid) {
         res.redirect('/');
     } else {
-        detail.findById(req.session.uid, (err, user) => {
-            res.render('settings', {
-                message: 'Account Settings',
-                bg: 'bg-light',
-                text: 'text-secondary',
-                details: user
-            });
+        const user = await detail.findById(req.session.uid);
+        res.render('settings', {
+            message: 'Account Settings',
+            bg: 'bg-light',
+            text: 'text-secondary',
+            details: user
         });
     }
 });
@@ -279,11 +274,11 @@ app.post('/save-settings', (req, res) => {
     });
 });
 
-app.post('/delete-account', (req, res) => {
+app.post('/delete-account', async (req, res) => {
     if (req.session.upp != 'profile-pic-default.png') {
         fs.unlink(__dirname + '/public/upload/' + req.session.upp, () => {});
     }
-    detail.findByIdAndDelete(req.session.uid);
+    await detail.findByIdAndDelete(req.session.uid);
     res.redirect('/log-out');
 });
 
@@ -295,21 +290,19 @@ app.get('/search-user', (req, res) => {
     res.render('search');
 });
 
-app.post('/search-user', (req, res) => {
-    detail.find({
+app.post('/search-user', async (req, res) => {
+    const user = await detail.find({
         fullName: new RegExp(req.body.userSearch, 'i')
-    }, (err, user) => {
-        res.send(user);
     });
+    res.send(user);
 });
 
-app.get('/users/:userName', (req, res) => {
-    detail.findOne({
+app.get('/users/:userName', async (req, res) => {
+    const user = await detail.findOne({
         userName: req.params.userName
-    }, (err, user) => {
-        res.render('view-profile', {
-            details: user
-        });
+    });
+    res.render('view-profile', {
+        details: user
     });
 });
 
