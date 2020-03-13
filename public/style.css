@@ -1,3 +1,4 @@
+/* my css */
 ::-webkit-scrollbar {
   width: 15px;
 }
@@ -23,6 +24,8 @@
 ::-webkit-scrollbar-track:window-inactive {
   background: #ffffff;
 }
+
+/* my css */
 
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600);
 @import url(https://fonts.googleapis.com/css?family=Fira+Mono);
@@ -9523,8 +9526,6 @@ a {
   }
 }
 
-._64c2ccaf {}
-
 ._5052cb2e {
   /*composes: dib-ns from global;*/
 }
@@ -9858,7 +9859,7 @@ a {
   outline: none;
   box-shadow: none;
   background-color: #fff;
-  border-color: #579ecf;
+  border-color: #343a40;
 }
 
 ._12c8ce87 {
@@ -9880,7 +9881,7 @@ a {
 }
 
 ._425fdea4:focus {
-  border-color: #1F8ACC;
+  border-color: #343a40;
   outline: 0;
 }
 

@@ -3,9 +3,10 @@
 
 <head>
   <title>Weebstopia</title>
+  <link rel="icon" type="image/ico" href="../favicon.ico">
   <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes">
-  <script src="script.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <script src="../script.js"></script>
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
@@ -15,17 +16,17 @@
         <main>
           <header>
             <a href="/">
-              <img src="Weebstopia.png" alt="Weebstopia">
+              <img src="../sticker.png" alt="Weebstopia">
             </a>
           </header>
           <div class="_94d452dc">
             <section class="_2b1f4808 bg-white br3">
               <div>
                 <form method="POST" action="/save-user" class="ma0">
-                  <h2 class="aa630ec5 f3 fw6 pb3 pt0 mt0 mb3 black-70 b--black-10 bb">Sign Up</h2>
+                  <h2 class="aa630ec5 f3 fw6 pb3 pt0 mt0 mb3 black-70 b--black-10 bb">Sign up</h2>
+                  <p class="<%= bg %> <%= text %> p-2 mb-4 m-2 text-center rounded"><%= message %></p>
                   <div>
-                    <p class="<%= bg %> <%= text %>"><%= message %></p>
-                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_fullname">
+                    <label class="db mt1 mb2 f5 fw6 black-70 nowrap " for="signup_fullname">
                       Full Name
                     </label>
                     <input type="text"
@@ -33,7 +34,7 @@
                       value="" autofocus required>
                   </div>
                   <div>
-                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_email">
+                    <label class="db mt1 mb2 f5 fw6 black-70 nowrap " for="signup_email">
                       Email
                     </label>
                     <input type="email"
@@ -41,24 +42,25 @@
                       value="" required>
                   </div>
                   <div>
-                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_name">
-                      Username
+                    <label class="db mt1 mb2 f5 fw6 black-70 nowrap " for="signup_name">
+                      User Name
                     </label>
                     <input type="text"
                       class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="userName"
                       pattern="[a-zA-Z0-9]+" title="Only alpha-numeric character are allowed!" value="" required>
                   </div>
                   <div>
-                    <label class="_64c2ccaf db mt1 mb2 f5 fw6 black-90 nowrap " for="signup_password">
+                    <label class="db mt1 mb2 f5 fw6 black-70 nowrap " for="signup_password">
                       Password
                     </label>
-                    <input type="password" minlength="6" title="Passwords should be longer than 6 characters!"
+                    <input type="password" minlength="5" title="Passwords should be longer than 5 characters!"
                       class="_425fdea4 relative w-100 ma2 ml0 pv3 pl2 pr2 br2 black-70 ba b--black-10  " name="password"
                       value="" required>
                   </div>
                   <div>
-                    <label for="remember_me">
-                      <input type="checkbox" value="true" name="remember"> Remember me
+                    <input type="checkbox" value="true" name="remember">
+                    <label class="mt3  mb3 f5 fw6 black-70 " for="remember_me">
+                      Remember me
                     </label>
                   </div>
                   <div>
@@ -66,16 +68,16 @@
                       <span class="_0bb7ba4f fw6 black-70">Make sure your:</span>
                     </p>
                     <ul class="dd5d12f9 mt3 mb4 lh-copy black-60">
-                      <li>Password is longer than 6 characters</li>
-                      <li>User name does not contain any alpha-numeric characters</li>
+                      <li>Password is longer than 5 characters</li>
+                      <li>User name contains only alpha-numeric characters</li>
                     </ul>
                   </div>
                   <button type="submit"
                     class="_24a1e9c7 dab9924c br2 pv2 ph3 fw5 f5 tc button button-reset pointer ma2 truncate ml0 no-underline e64d5a00 w-100">Sign
-                    Up
+                    up
                   </button>
                 </form>
-                <a href="/log-in" class="_6126477b db center tc mt3 mb2 f5 fw6 black-50 hover-black-80">or, Login
+                <a href="/log-in" class="_6126477b db center tc mt3 mb2 f5 fw6 black-50 hover-black-80">Login
                 </a>
               </div>
             </section>

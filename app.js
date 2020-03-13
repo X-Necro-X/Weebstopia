@@ -138,7 +138,7 @@ app.post('/save-user', (req, res) => {
 app.get('/log-in', (req, res) => {
     if (!req.session.uid) {
         res.render('log-in', {
-            message: 'Please Login!',
+            message: '',
             bg: 'bg-white',
             text: 'text-secondary'
         });
