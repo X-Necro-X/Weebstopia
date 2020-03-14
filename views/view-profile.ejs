@@ -21,11 +21,16 @@
             <div class="col-lg-3 col-sm-6">
 
                 <div class="card hovercard">
-                    <div class="cardheader">
-
+                    <button id="follow">
+                    </button>
+                    Followers:
+                    <div id="follower-count">
+                    </div>
+                    Following:
+                    <div id="following-count">
                     </div>
                     <div class="avatar">
-                        <img alt="" src="../<%= details.profilePic %>">
+                        <img alt="" height="250" width="250" src="../<%= details.profilePic %>">
                     </div>
                     <div class="info">
                         <div class="title">
@@ -40,26 +45,25 @@
     </div>
     <script>
         $(document).ready(function () {
-            var followVar = "<%= follows %>";            
-            buttonNamer(followVar);            
+            var followVar = "<%= follows %>";      
+            var followerCountVar = <%= details.followers.length %>;
+            var followingCountVar = <%= details.following.length %>;
+            editor(followVar, followerCountVar, followingCountVar);            
             $("#follow").on("click", function () {
                 $("#follow").prop("disabled", true);
                 $.post('/follow-user', {userName: "<%=details.userName%>", id: "<%=details._id%>", follows: followVar}, (data)=>{
                     followVar = data;                    
-                    buttonNamer(followVar);
+                    editor(followVar, (followVar == "-1") ? --followerCountVar : ++followerCountVar, followingCountVar);
                     $("#follow").prop("disabled", false);
                 });
             });
         });
-        function buttonNamer(followVar){
-            if (followVar == "-1") {
-                $('#follow').html('Follow');
-            } else {
-                $('#follow').html('Unfollow');
-            }
+        function editor(followVar, followerCountVar, followingCountVar){
+            $('#follow').html((followVar == "-1") ? 'Follow' : 'Unfollow');
+            $('#follower-count').html(followerCountVar);
+            $('#following-count').html(followingCountVar);
         }
     </script>
-    <button id="follow"></button>
 </body>
 
 </html>
