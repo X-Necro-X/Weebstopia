@@ -10,13 +10,15 @@ const crypto = require('crypto');
 const MongoStore = require('connect-mongo')(session);
 const upload = require('express-fileupload');
 const fs = require('fs').promises;
+const dotenv = require('dotenv');
 
 
 // -------------------------------------------------- server settings -------------------------------------------------- //
 
 
 const app = express();
-mongoose.connect('mongodb+srv://admin-necro:2634662@accounts-0uu7d.mongodb.net/Users', {
+dotenv.config();
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
@@ -47,13 +49,12 @@ const userDetail = new mongoose.Schema({
     userName: String,
     email: String,
     password: String,
-    profilePic: String
+    profilePic: String,
+    following: Array,
+    followers: Array
 });
 const detail = mongoose.model('detail', userDetail);
-app.use(upload({
-    safeFileNames: true,
-    preserveExtension: true
-}));
+app.use(upload());
 
 
 // -------------------------------------------------- root route -------------------------------------------------- //
@@ -309,8 +310,51 @@ app.get('/users/:userName', (req, res) => {
             userName: req.params.userName
         }, (err, user) => {
             res.render('view-profile', {
-                details: user
+                details: user,
+                follows: user.followers.indexOf(req.session.uid)
             });
+        });
+    }
+});
+
+
+// -------------------------------------------------- profile routes -------------------------------------------------- //
+
+
+app.post('/follow-user', async (req, res) => {
+    if (req.body.follows == "-1") {
+        await detail.updateOne({
+            _id: req.session.uid
+        }, {
+            $push: {
+                following: req.body.id
+            }
+        });
+        detail.updateOne({
+            _id: req.body.id
+        }, {
+            $push: {
+                followers: req.session.uid
+            }
+        }, () => {
+            res.send("1");
+        });
+    } else {
+        await detail.updateOne({
+            _id: req.session.uid
+        }, {
+            $pull: {
+                following: req.body.id
+            }
+        });
+        detail.updateOne({
+            _id: req.body.id
+        }, {
+            $pull: {
+                followers: req.session.uid
+            }
+        }, () => {
+            res.send("-1");
         });
     }
 });
