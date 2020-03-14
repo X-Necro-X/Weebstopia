@@ -302,13 +302,17 @@ app.post('/search-user', (req, res) => {
 });
 
 app.get('/users/:userName', (req, res) => {
-    detail.findOne({
-        userName: req.params.userName
-    }, (err, user) => {
-        res.render('view-profile', {
-            details: user
+    if (req.session.uun == req.params.userName) {
+        res.redirect('/');
+    } else {
+        detail.findOne({
+            userName: req.params.userName
+        }, (err, user) => {
+            res.render('view-profile', {
+                details: user
+            });
         });
-    });
+    }
 });
 
 
