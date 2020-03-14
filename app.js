@@ -188,7 +188,7 @@ app.get('/settings', (req, res) => {
     } else {
         detail.findById(req.session.uid, (err, user) => {
             res.render('settings', {
-                message: ['Account Settings'],
+                message: [''],
                 bg: 'bg-white',
                 text: 'text-secondary',
                 details: user
