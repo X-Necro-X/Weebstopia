@@ -25,6 +25,10 @@
   background: #ffffff;
 }
 
+#wallpaper {
+  background-image: url('../wallpaper.jpg');
+}
+
 /* my css */
 
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600);
@@ -10153,7 +10157,6 @@ a {
 
 /* these are lifted from the tachyons source */
 ._75ce47e7 {
-  background-color: #F7F7F7;
   min-height: 100vh;
   position: relative;
 }
@@ -10188,7 +10191,7 @@ a {
 
 @media screen and (min-width: 30em) {
   ._75ce47e7 header {
-    margin: 40px 0 40px;
+    margin: 50px 0 60px;
   }
 
   ._75ce47e7 header svg {
@@ -10196,7 +10199,7 @@ a {
   }
 
   ._94d452dc {
-    margin-bottom: 160px;
+    margin-bottom: 0px;
   }
 }
 
@@ -13759,7 +13762,7 @@ body {
   color: #212529;
   text-align: left;
   background-color: #fff;
-  margin: 10px 0px 10px 10px;
+  /* margin: 10px 0px 10px 10px; */
 }
 
 [tabindex="-1"]:focus:not(:focus-visible) {

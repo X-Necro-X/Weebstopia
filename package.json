@@ -18,6 +18,7 @@
     "express-fileupload": "^1.1.6",
     "express-session": "^1.17.0",
     "fs": "0.0.1-security",
+    "jwt-simple": "^0.5.6",
     "mongoose": "^5.9.3"
   }
 }
