@@ -23,7 +23,7 @@ mongoose.connect(process.env.MONGODB_URL, {
     useUnifiedTopology: true
 });
 app.use(session({
-    secret: "I'll Take A Potato Chip... And Eat It!",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: new MongoStore({
@@ -80,8 +80,8 @@ app.get('/sign-up', (req, res) => {
     if (!req.session.uid) {
         res.render('sign-up', {
             message: '',
-            bg: 'bg-white',
-            text: 'text-secondary'
+            bg: '',
+            text: ''
         });
     } else {
         res.redirect('/');
@@ -140,8 +140,8 @@ app.get('/log-in', (req, res) => {
     if (!req.session.uid) {
         res.render('log-in', {
             message: '',
-            bg: 'bg-white',
-            text: 'text-secondary'
+            bg: '',
+            text: ''
         });
     } else {
         res.redirect('/');
@@ -190,8 +190,8 @@ app.get('/settings', (req, res) => {
         detail.findById(req.session.uid, (err, user) => {
             res.render('settings', {
                 message: [''],
-                bg: 'bg-white',
-                text: 'text-secondary',
+                bg: '',
+                text: '',
                 details: user
             });
         });
@@ -357,6 +357,41 @@ app.post('/follow-user', async (req, res) => {
             res.send("-1");
         });
     }
+});
+
+
+// -------------------------------------------------- password reset routes -------------------------------------------------- //
+
+
+app.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', {
+        message: '',
+        verified: 0,
+        bg: '',
+        text: ''
+    });
+});
+
+app.post('/forgot-password-email', (req, res) => {
+    detail.findOne({
+        email: req.body.email
+    }, (err, user) => {
+        if (user) {
+            res.render('forgot-password', {
+                message: 'An email has been sent. Please click on the link when you get it.',
+                verified: 1,
+                bg: 'bg-white',
+                text: 'text-secondary'
+            });
+        } else {
+            res.render('forgot-password', {
+                message: 'Sorry, there is no user with that email.',
+                verified: 0,
+                bg: 'bg-danger',
+                text: 'text-white'
+            });
+        }
+    });
 });
 
 
