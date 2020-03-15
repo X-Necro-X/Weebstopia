@@ -11,6 +11,7 @@ const MongoStore = require('connect-mongo')(session);
 const upload = require('express-fileupload');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
+const jwt = require('jwt-simple');
 
 
 // -------------------------------------------------- server settings -------------------------------------------------- //
@@ -314,7 +315,7 @@ app.get('/users/:userName', (req, res) => {
 
 
 app.post('/follow-user', async (req, res) => {
-    if (req.body.follows == "-1") {
+    if (req.body.follows == '-1') {
         await detail.updateOne({
             _id: req.session.uid
         }, {
@@ -329,7 +330,7 @@ app.post('/follow-user', async (req, res) => {
                 followers: req.session.uid
             }
         }, () => {
-            res.send("1");
+            res.send('1');
         });
     } else {
         await detail.updateOne({
@@ -346,7 +347,7 @@ app.post('/follow-user', async (req, res) => {
                 followers: req.session.uid
             }
         }, () => {
-            res.send("-1");
+            res.send('-1');
         });
     }
 });
@@ -369,12 +370,19 @@ app.post('/forgot-password-email', (req, res) => {
         email: req.body.email
     }, (err, user) => {
         if (user) {
-            res.render('forgot-password', {
-                message: 'An email has been sent. Please click on the link when you get it.',
-                verified: 1,
-                bg: 'bg-white',
-                text: 'text-secondary'
-            });
+            const payload = {
+                id: user._id,
+                email: user.email
+            };
+            const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
+            const token = jwt.encode(payload, secret);
+            res.send('<a href="/reset-password/' + payload.id + '/' + token + '">Reset password</a>');
+            // res.render('forgot-password', {
+            //     message: 'An email has been sent. Please click on the link when you get it.',
+            //     verified: 1,
+            //     bg: 'bg-white',
+            //     text: 'text-secondary'
+            // });
         } else {
             res.render('forgot-password', {
                 message: 'Sorry, there is no user with that email.',
@@ -383,6 +391,58 @@ app.post('/forgot-password-email', (req, res) => {
                 text: 'text-white'
             });
         }
+    });
+});
+
+app.get('/reset-password/:id/:token', (req, res) => {
+    var valid = 1, payload;
+    detail.findById(req.params.id, (err, user) => {
+        const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
+        try {
+            payload = jwt.decode(req.params.token, secret);
+        } catch (err) {
+            valid = 0;
+        } finally {
+            if (valid)
+                res.send('<form action="/reset-password" method="POST">' +
+                    '<input type="hidden" name="id" value="' + payload.id + '" />' +
+                    '<input type="hidden" name="token" value="' + req.params.token + '" />' +
+                    '<input type="password" name="password" value="" placeholder="Enter your new password..." />' +
+                    '<input type="submit" value="Reset Password" />' +
+                    '</form>');
+            else
+                res.send("Invalid");
+        }
+    });
+});
+
+app.post('/reset-password', function (req, res) {
+    var valid = 1;
+    detail.findById(req.body.id, (err, user) => {
+        const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
+        try {
+            const payload = jwt.decode(req.body.token, secret);
+        } catch (err) {
+            valid = 0;
+        } finally {
+            if (valid)
+            {
+                p = crypto.createHash('sha256').update(req.body.password).digest('hex').toString();
+                user.password=p;
+                detail.updateOne({_id: req.body.id}, user, ()=>{
+                    res.send('done');
+                });
+            }
+
+            else
+                res.send("Invalid");
+        }
+    });
+});
+
+app.get('/p',(req, res)=>{
+    detail.find((err, user)=>{
+        res.send(user);
     });
 });
 
