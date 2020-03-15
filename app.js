@@ -33,14 +33,6 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
-app.use(express.static('public/index'));
-app.use(express.static('public/log-in'));
-app.use(express.static('public/profile'));
-app.use(express.static('public/search'));
-app.use(express.static('public/settings'));
-app.use(express.static('public/sign-up'));
-app.use(express.static('public/upload'));
-app.use(express.static('public/view-profile'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
