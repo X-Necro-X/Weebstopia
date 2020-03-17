@@ -9296,7 +9296,6 @@ a {
 
 /* Second row */
 ._4ea0e50d {
-  background-color: #fff;
   padding: 10px 0;
 }
 
@@ -9818,7 +9817,7 @@ a {
   outline: none;
   box-shadow: none;
   background-color: #fff;
-  border-color: #579ecf;
+  border-color: #343a40;
 }
 
 ._12c8ce87 {
@@ -9836,7 +9835,7 @@ a {
 @media screen and (min-width: 30em) {}
 
 ._425fdea4:focus {
-  border-color: #1F8ACC;
+  border-color: #343a40;
   outline: 0;
 }
 
@@ -9871,7 +9870,7 @@ a {
   outline-color: #ffffff;
   background-color: #d7dcdf;
   /* Do not remove - important for a11y */
-  border-color: #579ecf;
+  border-color: #343a40;
 }
 
 ._508cc1e8::-moz-focus-outer {
