@@ -12,6 +12,7 @@ const upload = require('express-fileupload');
 const fs = require('fs').promises;
 const dotenv = require('dotenv');
 const jwt = require('jwt-simple');
+const nodemailer = require('nodemailer');
 
 
 // -------------------------------------------------- server settings -------------------------------------------------- //
@@ -48,6 +49,13 @@ const userDetail = new mongoose.Schema({
 });
 const detail = mongoose.model('detail', userDetail);
 app.use(upload());
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'weebstopia@gmail.com',
+        pass: process.env.GMAIL_PASSWORD
+    }
+});
 
 
 // -------------------------------------------------- root route -------------------------------------------------- //
@@ -368,7 +376,7 @@ app.get('/forgot-password', (req, res) => {
 app.post('/forgot-password-email', (req, res) => {
     detail.findOne({
         email: req.body.email
-    }, (err, user) => {
+    }, async (err, user) => {
         if (user) {
             const payload = {
                 id: user._id,
@@ -376,13 +384,28 @@ app.post('/forgot-password-email', (req, res) => {
             };
             const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
             const token = jwt.encode(payload, secret);
-            res.send('<a href="/reset-password/' + payload.id + '/' + token + '">Reset password</a>');
-            // res.render('forgot-password', {
-            //     message: 'An email has been sent. Please click on the link when you get it.',
-            //     verified: 1,
-            //     bg: 'bg-white',
-            //     text: 'text-secondary'
-            // });
+            ejs.renderFile(__dirname + '/views/reset-password-mail.ejs', {
+                userName: user.userName,
+                pid: payload.id,
+                token: token
+            }, (err, mail) => {                
+                const mailOptions = {
+                    from: 'weebstopia@gmail.com',
+                    to: user.email,
+                    subject: 'Weebstopia Password Reset',
+                    html: mail
+                }
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (!error) {
+                        res.render('forgot-password', {
+                            message: 'An email has been sent. Please click on the link when you get it.',
+                            verified: 1,
+                            bg: 'bg-white',
+                            text: 'text-secondary'
+                        });
+                    }
+                });
+            });
         } else {
             res.render('forgot-password', {
                 message: 'Sorry, there is no user with that email.',
@@ -395,7 +418,8 @@ app.post('/forgot-password-email', (req, res) => {
 });
 
 app.get('/reset-password/:id/:token', (req, res) => {
-    var valid = 1, payload;
+    var valid = 1,
+        payload;
     detail.findById(req.params.id, (err, user) => {
         const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
         try {
@@ -403,15 +427,17 @@ app.get('/reset-password/:id/:token', (req, res) => {
         } catch (err) {
             valid = 0;
         } finally {
-            if (valid)
-                res.send('<form action="/reset-password" method="POST">' +
-                    '<input type="hidden" name="id" value="' + payload.id + '" />' +
-                    '<input type="hidden" name="token" value="' + req.params.token + '" />' +
-                    '<input type="password" name="password" value="" placeholder="Enter your new password..." />' +
-                    '<input type="submit" value="Reset Password" />' +
-                    '</form>');
-            else
-                res.send("Invalid");
+            if (valid) {
+                res.render('reset-password-page', {
+                    pid: payload.id,
+                    token: req.params.token
+                });
+            } else {
+                res.render('reset-password-page', {
+                    pid: 'null',
+                    token: 'invalid'
+                });
+            }
         }
     });
 });
@@ -425,24 +451,25 @@ app.post('/reset-password', function (req, res) {
         } catch (err) {
             valid = 0;
         } finally {
-            if (valid)
-            {
-                p = crypto.createHash('sha256').update(req.body.password).digest('hex').toString();
-                user.password=p;
-                detail.updateOne({_id: req.body.id}, user, ()=>{
-                    res.send('done');
+            if (valid) {
+                password = crypto.createHash('sha256').update(req.body.password).digest('hex').toString();
+                user.password = password;
+                detail.updateOne({
+                    _id: req.body.id
+                }, user, () => {
+                    res.render('log-in', {
+                        message: 'Password reset was successful! Please login to continue!',
+                        bg: 'bg-warning',
+                        text: 'text-white'
+                    });
+                });
+            } else {
+                res.render('reset-password-page', {
+                    pid: 'null',
+                    token: 'invalid'
                 });
             }
-
-            else
-                res.send("Invalid");
         }
-    });
-});
-
-app.get('/p',(req, res)=>{
-    detail.find((err, user)=>{
-        res.send(user);
     });
 });
 
