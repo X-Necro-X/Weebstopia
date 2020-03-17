@@ -44,8 +44,19 @@ const userDetail = new mongoose.Schema({
     email: String,
     password: String,
     profilePic: String,
-    following: Array,
-    followers: Array
+    animeList: Array,
+    followers: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
+        }
+    }],
+    following: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
+        }
+    }]
 });
 const detail = mongoose.model('detail', userDetail);
 app.use(upload());
@@ -388,7 +399,7 @@ app.post('/forgot-password-email', (req, res) => {
                 userName: user.userName,
                 pid: payload.id,
                 token: token
-            }, (err, mail) => {                
+            }, (err, mail) => {
                 const mailOptions = {
                     from: 'weebstopia@gmail.com',
                     to: user.email,
