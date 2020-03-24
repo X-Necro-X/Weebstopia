@@ -62,7 +62,7 @@ app.use(upload());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'weebstopia@gmail.com',
+        user: process.env.GMAIL_ID,
         pass: process.env.GMAIL_PASSWORD
     }
 });
