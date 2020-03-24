@@ -44,7 +44,6 @@ const userDetail = new mongoose.Schema({
     email: String,
     password: String,
     profilePic: String,
-    animeList: Array,
     followers: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
@@ -58,7 +57,7 @@ const userDetail = new mongoose.Schema({
         }
     }]
 });
-const detail = mongoose.model('detail', userDetail);
+const detail = mongoose.model('user', userDetail);
 app.use(upload());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
