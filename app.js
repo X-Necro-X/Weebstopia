@@ -343,7 +343,7 @@ app.get('/users/:userName', (req, res) => {
                         follows: user.followers.indexOf(req.session.uid)
                     });
                 } else {
-                    res.redirect('*');
+                    res.redirect('/404');
                 }
             });
         }
@@ -506,8 +506,16 @@ app.post('/reset-password', function (req, res) {
 });
 
 
-// -------------------------------------------------- listen -------------------------------------------------- //
+// -------------------------------------------------- misc -------------------------------------------------- //
 
+
+app.get('/404', (req, res) => {
+    res.render('404');
+});
+
+app.get('*', (req, res) => {
+    res.redirect('/404');
+});
 
 app.listen(3000, () => {
     console.log('Server started!');
@@ -520,9 +528,4 @@ app.get('/p', (req, res) => {
 
         res.send(user)
     });
-});
-
-
-app.get('*', (req, res) => {
-    res.render('404');
 });
