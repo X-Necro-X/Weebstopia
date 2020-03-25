@@ -47,17 +47,17 @@ const userDetail = new mongoose.Schema({
     followers: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
+            ref: 'detail'
         }
     }],
     following: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user'
+            ref: 'detail'
         }
     }]
 });
-const detail = mongoose.model('user', userDetail);
+const detail = mongoose.model('detail', userDetail);
 app.use(upload());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -290,12 +290,34 @@ app.post('/save-settings', async (req, res) => {
 });
 
 app.post('/delete-account', async (req, res) => {
-    
+    await detail.updateMany({
+        followers: {
+            user: req.session.uid
+        }
+    }, {
+        $pull: {
+            followers: {
+                user: req.session.uid
+            }
+        }
+    });
+    await detail.updateMany({
+        following: {
+            user: req.session.uid
+        }
+    }, {
+        $pull: {
+            following: {
+                user: req.session.uid
+            }
+        }
+    });
     if (req.session.upp != 'profile-pic-default.png') {
         fs.unlink(__dirname + '/public/upload/' + req.session.upp);
     }
-    await detail.findByIdAndDelete(req.session.uid);
-    res.redirect('/log-out');
+    await detail.findByIdAndDelete(req.session.uid, () => {
+        res.redirect('/log-out');
+    });
 });
 
 
@@ -303,7 +325,11 @@ app.post('/delete-account', async (req, res) => {
 
 
 app.get('/search-user', (req, res) => {
-    res.render('search');
+    if (!req.session.uid) {
+        res.redirect('/');
+    } else {
+        res.render('search');
+    }
 });
 
 app.post('/search-user', (req, res) => {
@@ -315,21 +341,25 @@ app.post('/search-user', (req, res) => {
 });
 
 app.get('/users/:userName', (req, res) => {
-    if (req.session.uun == req.params.userName) {
+    if (!req.session.uid) {
         res.redirect('/');
     } else {
-        detail.findOne({
-            userName: req.params.userName
-        }, (err, user) => {
-            if (user) {
-                res.render('view-profile', {
-                    details: user,
-                    follows: user.followers.indexOf(req.session.uid)
-                });
-            } else {
-                // res.redirect('404 page');
-            }
-        });
+        if (req.session.uun == req.params.userName) {
+            res.redirect('/');
+        } else {
+            detail.findOne({
+                userName: req.params.userName
+            }, (err, user) => {
+                if (user) {
+                    res.render('view-profile', {
+                        details: user,
+                        follows: user.followers.indexOf(req.session.uid)
+                    });
+                } else {
+                    // res.redirect('404 page');
+                }
+            });
+        }
     }
 });
 
@@ -506,3 +536,9 @@ app.listen(3000, () => {
 
 
 // -------------------------------------------------- end -------------------------------------------------- //
+app.get('/p', (req, res) => {
+    detail.find((err, user) => {
+        
+        res.send(user)
+    });
+});
