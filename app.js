@@ -58,6 +58,10 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+app.listen(3000, () => {
+    console.log('Server started!');
+});
+
 
 // -------------------------------------------------- root routes -------------------------------------------------- //
 
@@ -474,7 +478,7 @@ app.get('/reset-password/:id/:token', (req, res) => {
     });
 });
 
-app.post('/reset-password', function (req, res) {
+app.post('/reset-password', (req, res) => {
     var valid = 1;
     detail.findById(req.body.id, (err, user) => {
         const secret = user.password + '-' + user._id.getTimestamp() + '-' + process.env.JWT_SECRET;
@@ -506,7 +510,7 @@ app.post('/reset-password', function (req, res) {
 });
 
 
-// -------------------------------------------------- misc -------------------------------------------------- //
+// -------------------------------------------------- misc routes -------------------------------------------------- //
 
 
 app.get('/404', (req, res) => {
@@ -517,15 +521,5 @@ app.get('*', (req, res) => {
     res.redirect('/404');
 });
 
-app.listen(3000, () => {
-    console.log('Server started!');
-});
-
 
 // -------------------------------------------------- end -------------------------------------------------- //
-app.get('/p', (req, res) => {
-    detail.find((err, user) => {
-
-        res.send(user)
-    });
-});
