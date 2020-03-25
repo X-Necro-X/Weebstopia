@@ -290,6 +290,7 @@ app.post('/save-settings', async (req, res) => {
 });
 
 app.post('/delete-account', async (req, res) => {
+    
     if (req.session.upp != 'profile-pic-default.png') {
         fs.unlink(__dirname + '/public/upload/' + req.session.upp);
     }
@@ -320,10 +321,14 @@ app.get('/users/:userName', (req, res) => {
         detail.findOne({
             userName: req.params.userName
         }, (err, user) => {
-            res.render('view-profile', {
-                details: user,
-                follows: user.followers.indexOf(req.session.uid)
-            });
+            if (user) {
+                res.render('view-profile', {
+                    details: user,
+                    follows: user.followers.indexOf(req.session.uid)
+                });
+            } else {
+                // res.redirect('404 page');
+            }
         });
     }
 });
@@ -338,14 +343,18 @@ app.post('/follow-user', async (req, res) => {
             _id: req.session.uid
         }, {
             $push: {
-                following: req.body.id
+                following: {
+                    user: req.body.id
+                }
             }
         });
         detail.updateOne({
             _id: req.body.id
         }, {
             $push: {
-                followers: req.session.uid
+                followers: {
+                    user: req.session.uid
+                }
             }
         }, () => {
             res.send('1');
@@ -355,14 +364,18 @@ app.post('/follow-user', async (req, res) => {
             _id: req.session.uid
         }, {
             $pull: {
-                following: req.body.id
+                following: {
+                    user: req.body.id
+                }
             }
         });
         detail.updateOne({
             _id: req.body.id
         }, {
             $pull: {
-                followers: req.session.uid
+                followers: {
+                    user: req.session.uid
+                }
             }
         }, () => {
             res.send('-1');
@@ -400,7 +413,7 @@ app.post('/forgot-password-email', (req, res) => {
                 token: token
             }, (err, mail) => {
                 const mailOptions = {
-                    from: 'weebstopia@gmail.com',
+                    from: process.env.GMAIL_ID,
                     to: user.email,
                     subject: 'Weebstopia Password Reset',
                     html: mail
