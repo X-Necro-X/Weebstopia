@@ -35,6 +35,7 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(express.static('public/upload'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -44,18 +45,8 @@ const userDetail = new mongoose.Schema({
     email: String,
     password: String,
     profilePic: String,
-    followers: [{
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'detail'
-        }
-    }],
-    following: [{
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'detail'
-        }
-    }]
+    followers: Array,
+    following: Array
 });
 const detail = mongoose.model('detail', userDetail);
 app.use(upload());
@@ -68,7 +59,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// -------------------------------------------------- root route -------------------------------------------------- //
+// -------------------------------------------------- root routes -------------------------------------------------- //
 
 
 app.get('/', (req, res) => {
@@ -292,24 +283,20 @@ app.post('/save-settings', async (req, res) => {
 app.post('/delete-account', async (req, res) => {
     await detail.updateMany({
         followers: {
-            user: req.session.uid
+            $in: [req.session.uid]
         }
     }, {
         $pull: {
-            followers: {
-                user: req.session.uid
-            }
+            followers: req.session.uid
         }
     });
     await detail.updateMany({
         following: {
-            user: req.session.uid
+            $in: [req.session.uid]
         }
     }, {
         $pull: {
-            following: {
-                user: req.session.uid
-            }
+            following: req.session.uid
         }
     });
     if (req.session.upp != 'profile-pic-default.png') {
@@ -324,7 +311,7 @@ app.post('/delete-account', async (req, res) => {
 // -------------------------------------------------- search routes -------------------------------------------------- //
 
 
-app.get('/search-user', (req, res) => {
+app.get('/search', (req, res) => {
     if (!req.session.uid) {
         res.redirect('/');
     } else {
@@ -356,7 +343,7 @@ app.get('/users/:userName', (req, res) => {
                         follows: user.followers.indexOf(req.session.uid)
                     });
                 } else {
-                    // res.redirect('404 page');
+                    res.redirect('*');
                 }
             });
         }
@@ -373,18 +360,14 @@ app.post('/follow-user', async (req, res) => {
             _id: req.session.uid
         }, {
             $push: {
-                following: {
-                    user: req.body.id
-                }
+                following: req.body.id
             }
         });
         detail.updateOne({
             _id: req.body.id
         }, {
             $push: {
-                followers: {
-                    user: req.session.uid
-                }
+                followers: req.session.uid
             }
         }, () => {
             res.send('1');
@@ -394,18 +377,14 @@ app.post('/follow-user', async (req, res) => {
             _id: req.session.uid
         }, {
             $pull: {
-                following: {
-                    user: req.body.id
-                }
+                following: req.body.id
             }
         });
         detail.updateOne({
             _id: req.body.id
         }, {
             $pull: {
-                followers: {
-                    user: req.session.uid
-                }
+                followers: req.session.uid
             }
         }, () => {
             res.send('-1');
@@ -538,7 +517,12 @@ app.listen(3000, () => {
 // -------------------------------------------------- end -------------------------------------------------- //
 app.get('/p', (req, res) => {
     detail.find((err, user) => {
-        
+
         res.send(user)
     });
+});
+
+
+app.get('*', (req, res) => {
+    res.render('404');
 });
